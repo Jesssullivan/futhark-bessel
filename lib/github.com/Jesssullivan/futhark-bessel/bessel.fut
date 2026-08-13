@@ -5,6 +5,8 @@
 -- minimax coefficient array.  Its entire-domain error envelope is not yet
 -- certified, so this module is pre-release.
 
+import "root_cache"
+
 module f64 = {
   type status = #ok | #out_of_domain | #nonfinite
   type checked = {value: f64, status: status}
@@ -122,7 +124,7 @@ module f64 = {
   -- Bracketed bisection over asymptotic half-period brackets.  The public
   -- index contract remains explicit even though certified brackets are a
   -- separate, still-open release gate.
-  def positive_j1_root (index: i32) : root_result =
+  def positive_j1_root_solved (index: i32) : root_result =
     let pi = 0x1.921fb54442d18p+1
     let center = (f64.i32 index + 0.25) * pi
     let lo0 = center - pi / 4.0
@@ -150,6 +152,30 @@ module f64 = {
       iterations,
       converged = bracketed && hi - lo <= tolerance,
     }
+
+  -- Public roots consume an independently Arb-certified, disposable cache.
+  -- `positive_j1_root_solved` remains available to test recomputability; the
+  -- cache generator and its certificates, never this array, are authority.
+  def positive_j1_root (index: i32) : root_result =
+    if index < 1 || index > 256 then {
+      root = nan,
+      lo = nan,
+      hi = nan,
+      residual = nan,
+      iterations = 0,
+      converged = false,
+    }
+    else
+      let i = i64.i32 (index - 1)
+      let root = root_cache.f64.root[i]
+      in {
+        root,
+        lo = root_cache.f64.lo[i],
+        hi = root_cache.f64.hi[i],
+        residual = f64.abs (j1_finite root),
+        iterations = 0,
+        converged = true,
+      }
 }
 
 module f32 = {
@@ -256,7 +282,7 @@ module f32 = {
   def sign_change (a: f32) (b: f32) =
     (a <= 0.0 && b >= 0.0) || (a >= 0.0 && b <= 0.0)
 
-  def positive_j1_root (index: i32) : root_result =
+  def positive_j1_root_solved (index: i32) : root_result =
     let pi = 0x1.921fb60000000p+1f32
     let center = (f32.i32 index + 0.25) * pi
     let lo0 = center - pi / 4.0
@@ -284,4 +310,25 @@ module f32 = {
       iterations,
       converged = bracketed && hi - lo <= tolerance,
     }
+
+  def positive_j1_root (index: i32) : root_result =
+    if index < 1 || index > 256 then {
+      root = nan,
+      lo = nan,
+      hi = nan,
+      residual = nan,
+      iterations = 0,
+      converged = false,
+    }
+    else
+      let i = i64.i32 (index - 1)
+      let root = root_cache.f32.root[i]
+      in {
+        root,
+        lo = root_cache.f32.lo[i],
+        hi = root_cache.f32.hi[i],
+        residual = f32.abs (j1_finite root),
+        iterations = 0,
+        converged = true,
+      }
 }

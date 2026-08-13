@@ -6,6 +6,7 @@ from pathlib import Path
 
 sources = [
     Path("lib/github.com/Jesssullivan/futhark-bessel/bessel.fut"),
+    Path("lib/github.com/Jesssullivan/futhark-bessel/root_cache.fut"),
     Path("scripts/generate_constants.py"),
     Path("evidence/provenance.json"),
 ]

@@ -7,7 +7,7 @@ default:
   @just --list
 
 fmt:
-  find lib tests -name '*.fut' -print0 | xargs -0 futhark fmt --check
+  find lib tests -name '*.fut' ! -name 'root_cache.fut' -print0 | xargs -0 futhark fmt --check
   nixfmt --check flake.nix
 
 package:
@@ -34,8 +34,12 @@ oracle:
   build/arb_oracle > evidence/arb-certificates.jsonl
   python3 oracle/mpmath_crosscheck.py evidence/arb-certificates.jsonl
 
+root-cache: oracle
+  python3 scripts/render_root_cache.py
+
 evidence: oracle
   python3 scripts/check_evidence.py evidence/arb-certificates.jsonl
+  python3 scripts/render_root_cache.py --check
 
 coeff-hash:
   python3 scripts/coefficient_hash.py

@@ -50,7 +50,9 @@ entry status_contract =
   status_is_ok (bessel.f64.j1_checked (-1024.0)).status &&
   status_is_out_of_domain (bessel.f64.j0_checked 1024.0001).status &&
   status_is_nonfinite (bessel.f64.j1_checked f64.inf).status &&
-  status_is_nonfinite (bessel.f64.j0_checked f64.nan).status
+  status_is_nonfinite (bessel.f64.j0_checked f64.nan).status &&
+  !(bessel.f64.positive_j1_root 0).converged &&
+  f64.isnan (bessel.f64.positive_j1_root 257).root
 
 entry all_roots_bracketed =
   reduce (&&) true
