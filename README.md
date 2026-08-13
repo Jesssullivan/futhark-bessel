@@ -29,5 +29,14 @@ regression evidence, not declared release envelopes or whole-domain proofs.
 WebGPU is compile-checked only until a pinned runner with a ratified adapter is
 available.
 
+`just approximation-proof` regenerates 2,608 FLINT/Arb certificate rows for
+the exact-real interpretation of the current algorithm and independently
+verifies them with mpmath. The proof covers the defining-series and Hankel
+remainders, every range-reduction cell and tie, both switches and endpoints,
+trigonometric Taylor remainders, and the rounded phase/prefactor constants. Its
+committed summary is `evidence/real-approximation-bounds.json`. Backend
+floating-point rounding, contraction, and reassociation are explicitly outside
+that theorem and remain open release gates.
+
 Development is tracked under Wavegen TIN-3715. Licensed under the
 [ISC License](LICENSE).

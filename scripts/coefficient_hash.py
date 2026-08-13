@@ -9,6 +9,9 @@ sources = [
     Path("lib/github.com/Jesssullivan/futhark-bessel/bessel_internal.fut"),
     Path("lib/github.com/Jesssullivan/futhark-bessel/root_cache.fut"),
     Path("scripts/generate_constants.py"),
+    Path("oracle/approximation_bounds.c"),
+    Path("scripts/approximation_proof.py"),
+    Path("evidence/real-approximation-bounds.json"),
     Path("evidence/provenance.json"),
     Path("evidence/error-budget.json"),
 ]

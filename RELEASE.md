@@ -3,11 +3,13 @@
 No semantic release exists. A `v0.1.0` tag may be cut only when all gates below
 have machine-readable evidence at the tagged commit.
 
-- [ ] Independent interval certificates cover `J0` and `J1` on the complete
-      finite domain `|x| <= 1024`, including both endpoints and all reduction
-      boundaries.
-- [ ] Mathematical approximation bounds covering the series/Hankel switch and
-      the complete finite domain are recorded for f32 and f64.
+- [x] Independent FLINT/Arb certificates and an mpmath verifier cover the
+      exact-real `J0` and `J1` algorithms on `|x| <= 1024`, including both
+      endpoints, switches, all reduction cells, and both branches at every
+      reduction tie. Evidence is in `evidence/real-approximation-bounds.json`.
+- [x] Mathematical series, Hankel, phase-reduction, trigonometric-Taylor, and
+      prefactor bounds cover the complete finite domain for f32 and f64 under
+      exact-real semantics. They do not claim backend floating-point bounds.
 - [ ] Floating-point rounding/reassociation bounds and observed backend error
       envelopes are recorded separately for f32 and f64.
 - [x] A deterministic pinned harness executes identical Arb-certified sample

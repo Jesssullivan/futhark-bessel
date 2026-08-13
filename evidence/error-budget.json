@@ -8,7 +8,8 @@
       "f64_switch_abs_x": 12.0,
       "f32_terms": 49,
       "f32_switch_abs_x": 6.0,
-      "certification_status": "OPEN"
+      "certification_status": "CERTIFIED_EXACT_REAL",
+      "certificate": "evidence/real-approximation-bounds.json"
     },
     "large_argument": {
       "method": "Hankel expansion with DLMF 10.17(iii) first-neglected-term remainder theorem",
@@ -16,7 +17,20 @@
       "f64_switch_abs_x": 12.0,
       "f32_generated_terms": 7,
       "f32_switch_abs_x": 6.0,
-      "certification_status": "OPEN"
+      "certification_status": "CERTIFIED_EXACT_REAL",
+      "certificate": "evidence/real-approximation-bounds.json"
+    },
+    "range_reduction_and_elementary_functions": {
+      "method": "Exhaustive round-to-quadrant cell partition plus compositional interval bounds for split phase constants, sine/cosine Taylor tails, and the prefactor constant",
+      "boundary_certificates": 2584,
+      "switch_certificates": 4,
+      "certification_status": "CERTIFIED_EXACT_REAL",
+      "certificate": "evidence/real-approximation-bounds.json"
+    },
+    "whole_domain": {
+      "domain": "real x with |x| <= 1024",
+      "status": "CERTIFIED_EXACT_REAL_WHOLE_DOMAIN",
+      "excluded": "backend floating-point rounding, contraction, and reassociation"
     }
   },
   "floating_point_rounding_reassociation": {
