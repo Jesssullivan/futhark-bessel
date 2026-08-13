@@ -485,7 +485,7 @@ static void exact_asymptotic_value(arb_t result, const arb_t x,
 static void emit_interval_fields(const char *prefix, const arb_t value) {
   double lo, hi;
   interval_f64(value, &lo, &hi);
-  printf("\"%s_lo_hex\":\"%a\",\"%s_hi_hex\":\"%a\"", prefix,
+  printf("\"%s_lo_hex\":\"%.13a\",\"%s_hi_hex\":\"%.13a\"", prefix,
          lo, prefix, hi);
 }
 
@@ -512,16 +512,16 @@ static void emit_switch_certificate(const config_t *cfg, long order,
   arb_sub(gap, series_value, asymptotic_value, PREC);
   printf("{\"kind\":\"switch_certificate\",\"precision\":\"%s\",",
          cfg->precision);
-  printf("\"order\":%ld,\"x_hex\":\"%a\",\"active_branch\":\"series\",",
+  printf("\"order\":%ld,\"x_hex\":\"%.13a\",\"active_branch\":\"series\",",
          order, cfg->switch_x);
-  printf("\"series_actual_abs_upper_hex\":\"%a\",", series_actual);
-  printf("\"series_theorem_abs_upper_hex\":\"%a\",",
+  printf("\"series_actual_abs_upper_hex\":\"%.13a\",", series_actual);
+  printf("\"series_theorem_abs_upper_hex\":\"%.13a\",",
          upper_abs(series_bound));
-  printf("\"asymptotic_actual_abs_upper_hex\":\"%a\",",
+  printf("\"asymptotic_actual_abs_upper_hex\":\"%.13a\",",
          asymptotic_actual);
-  printf("\"asymptotic_theorem_abs_upper_hex\":\"%a\",",
+  printf("\"asymptotic_theorem_abs_upper_hex\":\"%.13a\",",
          upper_abs(asymptotic_bound));
-  printf("\"branch_gap_abs_upper_hex\":\"%a\",", upper_abs(gap));
+  printf("\"branch_gap_abs_upper_hex\":\"%.13a\",", upper_abs(gap));
   printf("\"certifier\":\"FLINT/Arb 3.6.0\"}\n");
   arb_clear(x);
   arb_clear(nu);
@@ -585,44 +585,44 @@ static void emit_bounds(const config_t *cfg, long order, const arb_t pi) {
   printf("{\"kind\":\"series_bound\",\"precision\":\"%s\",",
          cfg->precision);
   printf("\"order\":%ld,\"domain_abs_x_lo_hex\":\"0x0p+0\",", order);
-  printf("\"domain_abs_x_hi_hex\":\"%a\",", cfg->switch_x);
+  printf("\"domain_abs_x_hi_hex\":\"%.13a\",", cfg->switch_x);
   printf("\"last_retained_index\":%ld,\"first_omitted_index\":%ld,",
          cfg->series_last, cfg->series_last + 1);
-  printf("\"tail_ratio_abs_upper_hex\":\"%a\",", upper_abs(ratio));
-  printf("\"absolute_error_upper_hex\":\"%a\",",
+  printf("\"tail_ratio_abs_upper_hex\":\"%.13a\",", upper_abs(ratio));
+  printf("\"absolute_error_upper_hex\":\"%.13a\",",
          upper_abs(series_bound));
   printf("\"theorem\":\"alternating_first_omitted_term\"}\n");
 
   printf("{\"kind\":\"asymptotic_bound\",\"precision\":\"%s\",",
          cfg->precision);
-  printf("\"order\":%ld,\"domain_abs_x_lo_hex\":\"%a\",", order,
+  printf("\"order\":%ld,\"domain_abs_x_lo_hex\":\"%.13a\",", order,
          cfg->switch_x);
-  printf("\"domain_abs_x_hi_hex\":\"%a\",", DOMAIN_MAX);
+  printf("\"domain_abs_x_hi_hex\":\"%.13a\",", DOMAIN_MAX);
   printf("\"p_first_omitted_index\":%ld,\"q_first_omitted_index\":%ld,",
          first_even, first_odd);
   printf("\"p_ell\":%ld,\"q_ell\":%ld,",
          first_even / 2, (first_odd - 1) / 2);
   printf("\"dlmf_real_argument_conditions_certified\":true,");
-  printf("\"p_remainder_abs_upper_hex\":\"%a\",",
+  printf("\"p_remainder_abs_upper_hex\":\"%.13a\",",
          upper_abs(p_remainder));
-  printf("\"q_remainder_abs_upper_hex\":\"%a\",",
+  printf("\"q_remainder_abs_upper_hex\":\"%.13a\",",
          upper_abs(q_remainder));
-  printf("\"hankel_truncation_abs_upper_hex\":\"%a\",",
+  printf("\"hankel_truncation_abs_upper_hex\":\"%.13a\",",
          upper_abs(hankel_error));
-  printf("\"phase_reconstruction_abs_upper_hex\":\"%a\",",
+  printf("\"phase_reconstruction_abs_upper_hex\":\"%.13a\",",
          upper_abs(phase_error));
-  printf("\"reduced_argument_abs_upper_hex\":\"%a\",",
+  printf("\"reduced_argument_abs_upper_hex\":\"%.13a\",",
          upper_abs(radius));
-  printf("\"sin_total_abs_upper_hex\":\"%a\",", upper_abs(sin_error));
-  printf("\"cos_total_abs_upper_hex\":\"%a\",", upper_abs(cos_error));
-  printf("\"prefactor_abs_error_upper_hex\":\"%a\",",
+  printf("\"sin_total_abs_upper_hex\":\"%.13a\",", upper_abs(sin_error));
+  printf("\"cos_total_abs_upper_hex\":\"%.13a\",", upper_abs(cos_error));
+  printf("\"prefactor_abs_error_upper_hex\":\"%.13a\",",
          upper_abs(prefactor_error));
-  printf("\"p_sum_abs_upper_hex\":\"%a\",", upper_abs(p_abs));
-  printf("\"q_sum_abs_upper_hex\":\"%a\",", upper_abs(q_abs));
-  printf("\"n_magnitude_expression_upper_hex\":\"%a\",",
+  printf("\"p_sum_abs_upper_hex\":\"%.13a\",", upper_abs(p_abs));
+  printf("\"q_sum_abs_upper_hex\":\"%.13a\",", upper_abs(q_abs));
+  printf("\"n_magnitude_expression_upper_hex\":\"%.13a\",",
          upper_abs(n_expression));
   printf("\"n_abs_bound\":%ld,", N_ABS_BOUND);
-  printf("\"absolute_error_upper_hex\":\"%a\",", upper_abs(total_error));
+  printf("\"absolute_error_upper_hex\":\"%.13a\",", upper_abs(total_error));
   printf("\"theorem\":\"DLMF_10.17.iii_plus_compositional_phase_bound\"}\n");
   emit_switch_certificate(cfg, order, series_bound, total_error);
 
@@ -670,11 +670,11 @@ static void emit_endpoint(const config_t *cfg, long order, const char *position,
   }
   printf("{\"kind\":\"range_endpoint\",\"precision\":\"%s\",",
          cfg->precision);
-  printf("\"order\":%ld,\"position\":\"%s\",\"x_hex\":\"%a\",",
+  printf("\"order\":%ld,\"position\":\"%s\",\"x_hex\":\"%.13a\",",
          order, position, x_value);
   printf("\"selected_n\":%ld,", n);
   emit_interval_fields("reduced", remainder);
-  printf(",\"reduced_abs_upper_hex\":\"%a\"}\n", remainder_abs);
+  printf(",\"reduced_abs_upper_hex\":\"%.13a\"}\n", remainder_abs);
   arb_clear(x);
   arb_clear(offset);
   arb_clear(phase);
@@ -764,14 +764,14 @@ static void emit_range_partition(const config_t *cfg, long order) {
   arb_add(radius, radius, temporary, PREC);
   printf("{\"kind\":\"range_partition\",\"precision\":\"%s\",",
          cfg->precision);
-  printf("\"order\":%ld,\"domain_abs_x_lo_hex\":\"%a\",", order,
+  printf("\"order\":%ld,\"domain_abs_x_lo_hex\":\"%.13a\",", order,
          cfg->switch_x);
-  printf("\"domain_abs_x_hi_hex\":\"%a\",", DOMAIN_MAX);
+  printf("\"domain_abs_x_hi_hex\":\"%.13a\",", DOMAIN_MAX);
   printf("\"boundary_count\":%ld,\"first_boundary_left_n\":%ld,",
          count, first_n);
   printf("\"last_boundary_left_n\":%ld,", last_n);
-  printf("\"partition_endpoint_abs_upper_hex\":\"%a\",", partition_max);
-  printf("\"analytic_reduced_abs_upper_hex\":\"%a\",",
+  printf("\"partition_endpoint_abs_upper_hex\":\"%.13a\",", partition_max);
+  printf("\"analytic_reduced_abs_upper_hex\":\"%.13a\",",
          upper_abs(radius));
   printf("\"coverage\":\"all_rounding_cells_and_both_tie_branches\"}\n");
   arb_clear(reciprocal);

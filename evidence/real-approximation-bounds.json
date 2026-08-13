@@ -2,7 +2,7 @@
   "authority": {
     "certificate_ledger": "evidence/real-approximation-certificates.jsonl",
     "certificate_rows": 2608,
-    "certificate_sha256": "644f00f790eaf01b4b01474ec716b121e105554aff0547e5c71483ea89171a17",
+    "certificate_sha256": "3b74618585ad9c0941195a956002bacfe048a9716dbfe56114afe6ac3c5f7c2e",
     "certifier": "FLINT/Arb 3.6.0 at 1024-bit precision",
     "implementation_sha256": "2b459fb3e24e82a825db5f44cc8b3ebe9c8387d598235f84c4e80996b4e7d9d1",
     "implementation_source": "lib/github.com/Jesssullivan/futhark-bessel/bessel_internal.fut",
@@ -36,11 +36,11 @@
     "f64": {
       "j0": {
         "asymptotic_composite_absolute_error_upper_hex": "0x1.0b0b7f711ceefp-34",
-        "hankel_truncation_absolute_error_upper_hex": "0x1.0a9ff0440316p-34",
+        "hankel_truncation_absolute_error_upper_hex": "0x1.0a9ff04403160p-34",
         "series_absolute_error_upper_hex": "0x1.a831ecb7538c4p-509",
         "switch_active_branch": "series",
         "switch_asymptotic_observed_absolute_error_upper_hex": "0x1.22d9f463c44edp-35",
-        "switch_series_observed_absolute_error_upper_hex": "0x1.a69c5b5b26b6p-509"
+        "switch_series_observed_absolute_error_upper_hex": "0x1.a69c5b5b26b60p-509"
       },
       "j1": {
         "asymptotic_composite_absolute_error_upper_hex": "0x1.1fd4005da9863p-34",
@@ -48,7 +48,7 @@
         "series_absolute_error_upper_hex": "0x1.9f89b8dd61843p-513",
         "switch_active_branch": "series",
         "switch_asymptotic_observed_absolute_error_upper_hex": "0x1.5107c90c8bbc1p-37",
-        "switch_series_observed_absolute_error_upper_hex": "0x1.9e006e0add49p-513"
+        "switch_series_observed_absolute_error_upper_hex": "0x1.9e006e0add490p-513"
       }
     }
   },
@@ -58,14 +58,14 @@
         "boundary_count": 648,
         "first_boundary_left_n": 3,
         "last_boundary_left_n": 650,
-        "reduced_argument_absolute_upper_hex": "0x1.922522d07767p-1",
+        "reduced_argument_absolute_upper_hex": "0x1.922522d077670p-1",
         "tie_policy": "both adjacent quadrants certified"
       },
       "j1": {
         "boundary_count": 648,
         "first_boundary_left_n": 2,
         "last_boundary_left_n": 649,
-        "reduced_argument_absolute_upper_hex": "0x1.922522d07767p-1",
+        "reduced_argument_absolute_upper_hex": "0x1.922522d077670p-1",
         "tie_policy": "both adjacent quadrants certified"
       }
     },
