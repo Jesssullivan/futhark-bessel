@@ -74,7 +74,7 @@ def main() -> None:
     generated = constants()
     if args.check:
         source = Path(
-            "lib/github.com/Jesssullivan/futhark-bessel/bessel.fut"
+            "lib/github.com/Jesssullivan/futhark-bessel/bessel_internal.fut"
         ).read_text()
         missing = [value for value in generated if value not in source]
         if missing:

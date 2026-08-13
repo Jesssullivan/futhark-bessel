@@ -23,13 +23,23 @@
     "status": "OPEN",
     "note": "Requires backend-specific operation graphs and interval propagation; not inferred from oracle agreement."
   },
+  "pinned_compiler_smoke": {
+    "compiler_version": "Futhark 0.27.0 prerelease",
+    "compiler_git_commit": "8d6d12f0c31e133d7b5bd39c1254c541aa6ef70a",
+    "c_f64": "CONTRACT_TESTS_PASSED",
+    "c_f32": "CONTRACT_TESTS_PASSED",
+    "wasm_f64": "LIBRARY_COMPILED_NOT_EXECUTED",
+    "wasm_f32": "LIBRARY_COMPILED_NOT_EXECUTED",
+    "webgpu_f32": "LIBRARY_COMPILED_NOT_EXECUTED",
+    "scope": "Compilation and contract smoke tests only; these results are not numerical conformance evidence."
+  },
   "observed_backend_maxima": {
     "c_f64": null,
     "c_f32": null,
     "wasm_f64": null,
     "wasm_f32": null,
     "webgpu_f32": null,
-    "status": "PENDING_PINNED_COMPILER"
+    "status": "PENDING_NUMERICAL_COMPARISON"
   },
   "root_evidence": {
     "f64_brackets": {

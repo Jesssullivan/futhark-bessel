@@ -12,8 +12,8 @@ The package lives at the official Futhark package path:
 ```futhark
 import "lib/github.com/Jesssullivan/futhark-bessel/bessel"
 
-let checked = bessel.f32.j0_checked 12.0f32
-let root = bessel.f64.positive_j1_root 1
+let checked = f32_bessel.j0_checked 12.0f32
+let root = f64_bessel.positive_j1_root 1
 ```
 
 Use `nix develop --command just check` for the pinned repository gate. The

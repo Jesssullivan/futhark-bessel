@@ -2,7 +2,7 @@
 -- GENERATED DISPOSABLE CACHE. Authority: oracle/arb_oracle.c.
 -- Regenerate with `just oracle` then scripts/render_root_cache.py.
 
-module f64 = {
+module f64_cache = {
   def lo: [256]f64 = [
     0x1.ea75575af6f08p+1, 0x1.c0ff5f3b4724fp+2, 0x1.458d0d0bdfc29p+3, 0x1.aa5baf310e5a2p+3,
     0x1.0787b360508c4p+4, 0x1.39da8e7416ca3p+4, 0x1.6c294e3d4d8abp+4, 0x1.9e7570dcea106p+4,
@@ -203,7 +203,7 @@ module f64 = {
   ]
 }
 
-module f32 = {
+module f32_cache = {
   def lo: [256]f32 = [
     0x1.ea75560000000p+1f32, 0x1.c0ff5e0000000p+2f32, 0x1.458d0c0000000p+3f32, 0x1.aa5bae0000000p+3f32,
     0x1.0787b20000000p+4f32, 0x1.39da8e0000000p+4f32, 0x1.6c294e0000000p+4f32, 0x1.9e75700000000p+4f32,

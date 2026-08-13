@@ -2,6 +2,7 @@
 """Structural checks for independent interval evidence."""
 
 import json
+import struct
 import sys
 from pathlib import Path
 
@@ -26,8 +27,14 @@ for row in rows:
         }
         if set(row) != required or not row["certified_sign_change"]:
             raise SystemExit(f"malformed root certificate: {row}")
-        if not float.fromhex(row["lo_hex"]) < float.fromhex(row["hi_hex"]):
+        lo = float.fromhex(row["lo_hex"])
+        hi = float.fromhex(row["hi_hex"])
+        if not lo < hi:
             raise SystemExit(f"unordered root bracket: {row}")
+        lo_bits = struct.unpack(">Q", struct.pack(">d", lo))[0]
+        hi_bits = struct.unpack(">Q", struct.pack(">d", hi))[0]
+        if hi_bits != lo_bits + 1:
+            raise SystemExit(f"root bracket endpoints are not adjacent f64: {row}")
     elif set(row) != {"kind", "index", "x", "value"}:
         raise SystemExit(f"unexpected value evidence fields: {row}")
 print(f"OK {len(rows)} structurally valid Arb certificates")
