@@ -1,0 +1,45 @@
+{
+  "schema_version": "futhark-bessel.error-budget.v1",
+  "release_status": "INCOMPLETE",
+  "mathematical_approximation": {
+    "small_argument": {
+      "method": "Defining alternating power series evaluated through fixed terms",
+      "f64_terms": 97,
+      "f64_switch_abs_x": 12.0,
+      "f32_terms": 49,
+      "f32_switch_abs_x": 6.0,
+      "certification_status": "OPEN"
+    },
+    "large_argument": {
+      "method": "Hankel expansion with DLMF 10.17(iii) first-neglected-term remainder theorem",
+      "f64_generated_terms": 12,
+      "f64_switch_abs_x": 12.0,
+      "f32_generated_terms": 7,
+      "f32_switch_abs_x": 6.0,
+      "certification_status": "OPEN"
+    }
+  },
+  "floating_point_rounding_reassociation": {
+    "status": "OPEN",
+    "note": "Requires backend-specific operation graphs and interval propagation; not inferred from oracle agreement."
+  },
+  "observed_backend_maxima": {
+    "c_f64": null,
+    "c_f32": null,
+    "wasm_f64": null,
+    "wasm_f32": null,
+    "webgpu_f32": null,
+    "status": "PENDING_PINNED_COMPILER"
+  },
+  "root_evidence": {
+    "f64_brackets": {
+      "count": 256,
+      "format": "outward-rounded adjacent binary64 endpoints",
+      "certifier": "FLINT/Arb 3.6.0",
+      "status": "CERTIFIED"
+    },
+    "f32_ulp": null,
+    "f32_residual": null,
+    "status": "PARTIAL"
+  }
+}

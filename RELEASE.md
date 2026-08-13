@@ -6,9 +6,10 @@ have machine-readable evidence at the tagged commit.
 - [ ] Independent interval certificates cover `J0` and `J1` on the complete
       finite domain `|x| <= 1024`, including both endpoints and all reduction
       boundaries.
-- [ ] Separately accounted mathematical approximation, floating-point
-      rounding/reassociation, and observed backend error envelopes exist for
-      f32 and f64.
+- [ ] Mathematical approximation bounds covering the series/Hankel switch and
+      the complete finite domain are recorded for f32 and f64.
+- [ ] Floating-point rounding/reassociation bounds and observed backend error
+      envelopes are recorded separately for f32 and f64.
 - [ ] The f32 implementation passes C, WASM, and WebGPU conformance with its
       declared ULP/residual envelopes.
 - [ ] The f64 implementation passes C and WASM conformance with its declared

@@ -9,6 +9,7 @@ sources = [
     Path("lib/github.com/Jesssullivan/futhark-bessel/root_cache.fut"),
     Path("scripts/generate_constants.py"),
     Path("evidence/provenance.json"),
+    Path("evidence/error-budget.json"),
 ]
 digest = hashlib.sha256()
 for source in sources:
