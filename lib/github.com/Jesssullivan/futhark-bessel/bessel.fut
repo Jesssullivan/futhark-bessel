@@ -134,7 +134,7 @@ module f64 = {
     let fhi0 = if valid then j1_finite hi0 else 1.0
     let bracketed = valid && sign_change flo0 fhi0
     let tolerance = 4.0 * 0x1.0p-52 * f64.max 1.0 center
-    let (lo, hi, flo, fhi, iterations) =
+    let (lo, hi, _, _, iterations) =
       loop (lo, hi, flo, fhi, it) = (lo0, hi0, flo0, fhi0, 0) while
         bracketed && it < 96 && hi - lo > tolerance do
         let mid = lo + (hi - lo) / 2.0
@@ -292,7 +292,7 @@ module f32 = {
     let fhi0 = if valid then j1_finite hi0 else 1.0
     let bracketed = valid && sign_change flo0 fhi0
     let tolerance = 4.0 * 0x1.0p-23f32 * f32.max 1.0 center
-    let (lo, hi, flo, fhi, iterations) =
+    let (lo, hi, _, _, iterations) =
       loop (lo, hi, flo, fhi, it) = (lo0, hi0, flo0, fhi0, 0) while
         bracketed && it < 48 && hi - lo > tolerance do
         let mid = lo + (hi - lo) / 2.0
