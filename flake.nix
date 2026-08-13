@@ -19,6 +19,7 @@
       system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
+        emscripten = pkgs.emscripten;
         futhark = futhark-src.packages.${system}.default;
         python = pkgs.python3.withPackages (ps: [
           ps.mpmath
@@ -34,6 +35,7 @@
             jq
             nixfmt
             clang
+            emscripten
             flint
             futhark
             python
@@ -56,9 +58,14 @@
         checks.toolchain =
           pkgs.runCommand "futhark-bessel-toolchain"
             {
-              nativeBuildInputs = [ futhark ];
+              nativeBuildInputs = [
+                emscripten
+                futhark
+              ];
             }
             ''
+              emcc --version | grep -F "6.0.5"
+              test "${emscripten.version}" = "6.0.5"
               futhark --version | grep -F "Futhark 0.27.0"
               test "$(cat ${futhark}/commit-id)" = "8d6d12f0c31e133d7b5bd39c1254c541aa6ef70a"
               touch "$out"
