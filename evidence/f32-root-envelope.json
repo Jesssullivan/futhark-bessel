@@ -1,0 +1,48 @@
+{
+  "authority": {
+    "certificate_library": "FLINT/Arb 3.6.0 arb_hypgeom_bessel_j",
+    "certificates": "evidence/root-envelope-certificates.jsonl",
+    "certificates_sha256": "41e211f41ee3ad671b494f7bf7702cc8e7e5269d1e29a2a44ad5e12026f6126c",
+    "implementation": "lib/github.com/Jesssullivan/futhark-bessel/bessel_internal.fut",
+    "implementation_sha256": "2b459fb3e24e82a825db5f44cc8b3ebe9c8387d598235f84c4e80996b4e7d9d1",
+    "independent_library": "mpmath 1.4.1 besselj/besseljzero",
+    "independent_verifier": "scripts/root_envelope_proof.py",
+    "independent_verifier_sha256": "4e04c7f2dee10712d1eeda9d3618e42b9e5162caf20ac75f31f9dd4622a952c5",
+    "oracle": "oracle/root_envelopes.c",
+    "oracle_sha256": "eb9ddf6b6b60d1222181ceff2b2be4cc359f0f82a2f077d1141e80a77fafc394",
+    "root_cache": "lib/github.com/Jesssullivan/futhark-bessel/root_cache.fut",
+    "root_cache_sha256": "ba31e5cb5d34ca65ba6a2ff0b6d194b2bd1cfe8a286ebb70479766ae16c04642"
+  },
+  "envelopes": {
+    "certified_maximum_true_residual_upper_hex": "0x1.16c24b25ef3f5p-20",
+    "certified_maximum_true_residual_upper_index": 172,
+    "index_domain": {
+      "maximum": 256,
+      "minimum": 1
+    },
+    "precision": "f32",
+    "root_ulp_error_upper": 0,
+    "true_residual_abs_upper_hex": "0x1.0000000000000p-19"
+  },
+  "independent_replay": {
+    "all_correctly_rounded": true,
+    "maximum_true_residual_decimal": "1.038458046206294024639857595898372199805e-6",
+    "maximum_true_residual_index": 172,
+    "root_count": 256
+  },
+  "release_conformance": false,
+  "release_implications": {
+    "backend_lowering_equivalence": "OPEN",
+    "f32_cached_root_ulp_and_mathematical_residual": "CERTIFIED",
+    "f32_reported_residual": "BACKEND_CONFORMANCE_OPEN",
+    "f64_root_envelope": "OPEN",
+    "overall_release_status": "INCOMPLETE",
+    "root_solver_arithmetic": "OPEN"
+  },
+  "schema_version": "futhark-bessel.f32-root-envelope.v1",
+  "scope": {
+    "covered": "all 256 binary32 root literals returned by the public cached positive_j1_root path; ULP distance is measured against the correctly rounded mathematical J1 root and residual means the independent mathematical value |J1(r_hat)|",
+    "excluded": "positive_j1_root_solved arithmetic and stopping logic, the implementation-reported approximate residual, f64 root envelopes, and C/WASM/WebGPU lowering or runtime conformance"
+  },
+  "status": "SOURCE_CACHE_ROOT_ENVELOPE_CERTIFIED"
+}

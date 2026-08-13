@@ -20,6 +20,7 @@ adjacent = json.loads(
 observed_envelopes = json.loads(
     Path("evidence/observed-regression-envelopes.json").read_text()
 )
+root_envelope = json.loads(Path("evidence/f32-root-envelope.json").read_text())
 
 if observations.get("status") != "OBSERVED_BASELINE_NOT_RELEASE_CONFORMANCE":
     raise SystemExit("BLOCKED: backend evidence must remain explicitly non-ratifying")
@@ -121,10 +122,37 @@ if observed_envelopes.get("status") != (
     raise SystemExit("BLOCKED: observed envelopes must remain sample-only")
 if observed_envelopes.get("release_conformance") is not False:
     raise SystemExit("BLOCKED: observed envelopes cannot confer conformance")
+if root_envelope.get("status") != "SOURCE_CACHE_ROOT_ENVELOPE_CERTIFIED":
+    raise SystemExit("BLOCKED: f32 cached-root envelope certificate is missing")
+if root_envelope.get("release_conformance") is not False:
+    raise SystemExit("BLOCKED: source root evidence cannot confer backend conformance")
+if root_envelope.get("envelopes", {}).get("root_ulp_error_upper") != 0:
+    raise SystemExit("BLOCKED: f32 cached roots are not certified correctly rounded")
+if root_envelope.get("envelopes", {}).get("true_residual_abs_upper_hex") != (
+    "0x1.0000000000000p-19"
+):
+    raise SystemExit("BLOCKED: f32 true-residual envelope drifted")
+if root_envelope.get("release_implications") != {
+    "backend_lowering_equivalence": "OPEN",
+    "f32_cached_root_ulp_and_mathematical_residual": "CERTIFIED",
+    "f32_reported_residual": "BACKEND_CONFORMANCE_OPEN",
+    "f64_root_envelope": "OPEN",
+    "overall_release_status": "INCOMPLETE",
+    "root_solver_arithmetic": "OPEN",
+}:
+    raise SystemExit("BLOCKED: f32 root-envelope release boundary drifted")
+root_budget = error_budget.get("root_evidence", {})
+if root_budget.get("f32_release_ulp_envelope", {}).get("maximum_ulp_error") != 0:
+    raise SystemExit("BLOCKED: f32 root ULP error budget drifted")
+if root_budget.get("f32_release_residual_envelope", {}).get(
+    "maximum_true_residual_abs_hex"
+) != "0x1.0000000000000p-19":
+    raise SystemExit("BLOCKED: f32 root residual error budget drifted")
 
 required_closed_fragments = (
     "Independent FLINT/Arb certificates",
     "Mathematical series, Hankel, phase-reduction",
+    "All 256 public cached f32 roots",
 )
 for fragment in required_closed_fragments:
     matching = [line for line in release_lines if fragment in line]

@@ -81,12 +81,23 @@
       "certifier": "FLINT/Arb 3.6.0",
       "status": "CERTIFIED"
     },
-    "f32_release_ulp_envelope": null,
-    "f32_release_residual_envelope": null,
+    "f32_release_ulp_envelope": {
+      "maximum_ulp_error": 0,
+      "scope": "all 256 public cached binary32 roots against the correctly rounded mathematical J1 roots",
+      "evidence": "evidence/f32-root-envelope.json",
+      "status": "CERTIFIED_SOURCE_CACHE_ARTIFACT"
+    },
+    "f32_release_residual_envelope": {
+      "maximum_true_residual_abs_hex": "0x1.0000000000000p-19",
+      "quantity": "independent mathematical |J1(r_hat)| at the cached binary32 root",
+      "evidence": "evidence/f32-root-envelope.json",
+      "status": "CERTIFIED_SOURCE_CACHE_ARTIFACT",
+      "excluded": "implementation-reported approximate residual, positive_j1_root_solved, and backend lowering"
+    },
     "f32_observed_regression_envelope": {
       "evidence": "evidence/observed-regression-envelopes.json",
       "status": "OBSERVATION_ONLY_NOT_RELEASE_CONFORMANCE"
     },
-    "status": "PARTIAL"
+    "status": "F32_CACHE_ENVELOPE_CERTIFIED_F64_AND_SOLVER_OPEN"
   }
 }
