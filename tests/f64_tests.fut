@@ -5,7 +5,7 @@ import "../lib/github.com/Jesssullivan/futhark-bessel/bessel"
 -- entry: identity_bits
 -- input {} output { true true true true }
 -- entry: first_roots
--- input {} output { true true true }
+-- input {} output { [true, true, true] }
 -- entry: status_contract
 -- input {} output { true }
 -- entry: all_roots_bracketed

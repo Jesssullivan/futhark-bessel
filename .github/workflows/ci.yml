@@ -23,7 +23,7 @@ jobs:
           fetch-depth: 0
       - name: Install Nix
         uses: cachix/install-nix-action@b4b293eae0b79aac8a161bb32925a5508c9cca93
-      - name: Evaluate pinned flake
-        run: nix flake check --no-build
+      - name: Build pinned flake checks
+        run: nix flake check
       - name: Run repository gate
         run: nix develop --command just check

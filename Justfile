@@ -42,7 +42,6 @@ coeff-hash:
 
 check: fmt package check-source typecheck test-c compile-webgpu evidence coeff-hash
   gitleaks dir --no-banner --redact .
-  nix flake check --no-build
 
 release-preflight: check
   python3 scripts/release_preflight.py
