@@ -1,0 +1,12 @@
+.direnv/
+.futhark-test/
+.gitleaks.toml.local
+.nix-*
+build/
+result
+result-*
+*.c
+*.h
+*.js
+*.wasm
+*.local.md
