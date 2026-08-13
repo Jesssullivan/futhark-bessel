@@ -18,6 +18,7 @@ check-source:
   python3 scripts/generate_constants.py --check
 
 typecheck:
+  futhark check --Werror tests/backend_conformance.fut
   futhark check --Werror tests/f32_tests.fut
   futhark check --Werror tests/f64_tests.fut
 
@@ -30,7 +31,7 @@ compile-webgpu:
 
 oracle:
   mkdir -p build evidence
-  cc -std=c11 -O2 -Wall -Wextra -Werror oracle/arb_oracle.c -lflint -lm -o build/arb_oracle
+  cc -std=c11 -O2 -Wall -Wextra -Werror oracle/arb_oracle.c -lflint -lmpfr -lm -o build/arb_oracle
   build/arb_oracle > evidence/arb-certificates.jsonl
   python3 oracle/mpmath_crosscheck.py evidence/arb-certificates.jsonl
 
@@ -41,10 +42,16 @@ evidence: oracle
   python3 scripts/check_evidence.py evidence/arb-certificates.jsonl
   python3 scripts/render_root_cache.py --check
 
+backend-conformance: evidence
+  python3 scripts/backend_conformance.py --check
+
+backend-conformance-write: evidence
+  python3 scripts/backend_conformance.py --write
+
 coeff-hash:
   python3 scripts/coefficient_hash.py
 
-check: fmt package check-source typecheck test-c compile-webgpu evidence coeff-hash
+check: fmt package check-source typecheck test-c compile-webgpu backend-conformance coeff-hash
   gitleaks dir --no-banner --redact .
 
 release-preflight: check

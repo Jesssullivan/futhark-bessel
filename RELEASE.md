@@ -10,6 +10,10 @@ have machine-readable evidence at the tagged commit.
       the complete finite domain are recorded for f32 and f64.
 - [ ] Floating-point rounding/reassociation bounds and observed backend error
       envelopes are recorded separately for f32 and f64.
+- [x] A deterministic pinned harness executes identical Arb-certified sample
+      and root ledgers through the C and WASM runtimes and records observed
+      absolute, ULP, and residual maxima by precision, domain, and backend.
+      These observations are regression evidence, not release envelopes.
 - [ ] The f32 implementation passes C, WASM, and WebGPU conformance with its
       declared ULP/residual envelopes.
 - [ ] The f64 implementation passes C and WASM conformance with its declared
@@ -27,4 +31,5 @@ have machine-readable evidence at the tagged commit.
       evidence pass from the pinned Nix shell.
 
 The current branch is a provenance-clean prototype, not a released numerical
-library. `just release-preflight` fails closed until these gates are evidenced.
+library. WebGPU compilation is not numerical runtime conformance. `just
+release-preflight` fails closed until the unchecked gates are evidenced.

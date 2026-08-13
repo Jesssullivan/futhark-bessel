@@ -14,12 +14,12 @@
     {
       "name": "FLINT/Arb arb_hypgeom_bessel_j",
       "version": "3.6.0",
-      "role": "interval certificates"
+      "role": "interval certificates and uniquely rounded IEEE runtime goldens"
     },
     {
       "name": "mpmath besselj",
       "version": "1.4.1",
-      "role": "independent multiprecision cross-check"
+      "role": "independent multiprecision containment and rounding cross-check"
     }
   ],
   "primary_references": [

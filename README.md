@@ -21,5 +21,13 @@ implementation is generated directly from mathematical definitions; independent
 evidence uses FLINT/Arb and mpmath. Exact provenance is structured in
 `evidence/provenance.json`.
 
+`just backend-conformance` executes identical Arb-certified value samples and
+all 256 certified roots through Futhark's sequential C and WASM runtimes. It
+checks the committed machine-readable observation baseline in
+`evidence/backend-observations.json`. The recorded maxima are finite-sample
+regression evidence, not declared release envelopes or whole-domain proofs.
+WebGPU is compile-checked only until a pinned runner with a ratified adapter is
+available.
+
 Development is tracked under Wavegen TIN-3715. Licensed under the
 [ISC License](LICENSE).

@@ -21,6 +21,7 @@
         pkgs = nixpkgs.legacyPackages.${system};
         emscripten = pkgs.emscripten;
         futhark = futhark-src.packages.${system}.default;
+        node = pkgs.nodejs_22;
         python = pkgs.python3.withPackages (ps: [
           ps.mpmath
         ]);
@@ -38,6 +39,7 @@
             emscripten
             flint
             futhark
+            node
             python
           ];
           shellHook = ''
@@ -61,6 +63,7 @@
               nativeBuildInputs = [
                 emscripten
                 futhark
+                node
               ];
             }
             ''
@@ -68,6 +71,7 @@
               test "${emscripten.version}" = "6.0.5"
               futhark --version | grep -F "Futhark 0.27.0"
               test "$(cat ${futhark}/commit-id)" = "8d6d12f0c31e133d7b5bd39c1254c541aa6ef70a"
+              test "$(node --version)" = "v${node.version}"
               touch "$out"
             '';
 

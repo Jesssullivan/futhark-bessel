@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import json
 import re
+import struct
 import sys
 from pathlib import Path
 
@@ -40,6 +41,48 @@ def main(path_text: str) -> None:
                 raise SystemExit(
                     f"mpmath root escaped Arb bracket: J1 root {row['index']}"
                 )
+            rounded64 = struct.unpack(">Q", struct.pack(">d", float(reference)))[0]
+            rounded32 = struct.unpack(
+                ">I", struct.pack(">f", float(reference))
+            )[0]
+            if rounded64 != int(row["root_f64_reference_bits"], 16):
+                raise SystemExit(
+                    f"mpmath disagrees with rounded f64 root {row['index']}"
+                )
+            if rounded32 != int(row["root_f32_reference_bits"], 16):
+                raise SystemExit(
+                    f"mpmath disagrees with rounded f32 root {row['index']}"
+                )
+            continue
+        if row["kind"] == "conformance_value":
+            if row["precision"] == "f32":
+                x = struct.unpack(
+                    ">f", struct.pack(">I", int(row["x_bits"], 16))
+                )[0]
+                pack_format = ">f"
+                bits_format = ">I"
+            else:
+                x = struct.unpack(
+                    ">d", struct.pack(">Q", int(row["x_bits"], 16))
+                )[0]
+                pack_format = ">d"
+                bits_format = ">Q"
+            for order in (0, 1):
+                reference = mp.besselj(order, mp.mpf(x))
+                lo, hi = parse_ball(row[f"j{order}_ball"])
+                if not lo <= reference <= hi:
+                    raise SystemExit(
+                        f"mpmath reference escaped Arb conformance ball: "
+                        f"J{order}({x!r})"
+                    )
+                rounded = struct.unpack(
+                    bits_format, struct.pack(pack_format, float(reference))
+                )[0]
+                if rounded != int(row[f"j{order}_reference_bits"], 16):
+                    raise SystemExit(
+                        f"mpmath disagrees with rounded {row['precision']} "
+                        f"J{order} reference at {x!r}"
+                    )
             continue
         x = mp.mpf(row["x"])
         order = 0 if row["kind"] == "j0" else 1
