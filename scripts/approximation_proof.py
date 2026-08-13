@@ -22,6 +22,10 @@ IMPLEMENTATION = Path(
 )
 DOMAIN_MAX = Fraction(1024)
 N_ABS_BOUND = 653
+EXPECTED_IMPLEMENTATION_SHA256 = (
+    "2b459fb3e24e82a825db5f44cc8b3ebe9c8387d598235f84c4e80996b4e7d9d1"
+)
+EXPECTED_MPMATH_VERSION = "1.4.1"
 
 CONFIGS: dict[str, dict[str, Any]] = {
     "f32": {
@@ -129,7 +133,13 @@ def verify_source_contract() -> str:
                 module, function
             ) and "f32.abs x > 1024.0" not in function_body(module, function):
                 raise SystemExit(f"{precision} checked domain drifted")
-    return hashlib.sha256(source.encode()).hexdigest()
+    source_sha256 = hashlib.sha256(source.encode()).hexdigest()
+    if source_sha256 != EXPECTED_IMPLEMENTATION_SHA256:
+        raise SystemExit(
+            "certified implementation source changed; review the proof model "
+            "before updating EXPECTED_IMPLEMENTATION_SHA256"
+        )
+    return source_sha256
 
 
 def exact_hex(text: str) -> Fraction:
@@ -721,6 +731,10 @@ def main() -> None:
     action.add_argument("--check", action="store_true")
     action.add_argument("--write", action="store_true")
     args = parser.parse_args()
+    if mp.__version__ != EXPECTED_MPMATH_VERSION:
+        raise SystemExit(
+            f"expected mpmath {EXPECTED_MPMATH_VERSION}, got {mp.__version__}"
+        )
     mp.mp.dps = 180
     raw = CERTIFICATES.read_bytes()
     generated = json.dumps(generate_summary(raw), indent=2, sort_keys=True) + "\n"

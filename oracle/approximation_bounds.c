@@ -21,6 +21,11 @@
 #include <stdio.h>
 #include <string.h>
 
+#if __FLINT_VERSION != 3 || __FLINT_VERSION_MINOR != 6 ||                      \
+    __FLINT_VERSION_PATCHLEVEL != 0
+#error "approximation certificates require FLINT/Arb 3.6.0"
+#endif
+
 #define PREC 1024
 #define DOMAIN_MAX 1024.0
 #define N_ABS_BOUND 653L
