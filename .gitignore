@@ -7,6 +7,7 @@ evidence/*.jsonl
 result
 result-*
 *.c
+!oracle/*.c
 *.h
 *.js
 *.wasm
