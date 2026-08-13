@@ -6,6 +6,7 @@ from pathlib import Path
 DISALLOWED = ("numerical recipes", "cephes", "hart")
 ALLOWED_CONTRACT_FILES = {"AGENTS.md", "RELEASE.md"}
 ALLOWED_CONTRACT_FILES.add(Path(__file__).name)
+ALLOWED_CONTRACT_FILES.add("provenance.json")
 
 for path in Path(".").rglob("*"):
     if not path.is_file() or ".git" in path.parts:

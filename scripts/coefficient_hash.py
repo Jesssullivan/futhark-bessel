@@ -4,6 +4,15 @@
 import hashlib
 from pathlib import Path
 
-source = Path("lib/github.com/Jesssullivan/futhark-bessel/bessel.fut")
-digest = hashlib.sha256(source.read_bytes()).hexdigest()
-print(f"sha256:{digest}  {source}")
+sources = [
+    Path("lib/github.com/Jesssullivan/futhark-bessel/bessel.fut"),
+    Path("scripts/generate_constants.py"),
+    Path("evidence/provenance.json"),
+]
+digest = hashlib.sha256()
+for source in sources:
+    digest.update(source.as_posix().encode())
+    digest.update(b"\0")
+    digest.update(source.read_bytes())
+    digest.update(b"\0")
+print(f"sha256:{digest.hexdigest()}  numerical-source-bundle")

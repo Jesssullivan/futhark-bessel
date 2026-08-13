@@ -7,15 +7,15 @@ default:
   @just --list
 
 fmt:
-  futhark fmt --check lib tests
+  find lib tests -name '*.fut' -print0 | xargs -0 futhark fmt --check
   nixfmt --check flake.nix
-  futhark pkg fmt
 
 package:
   futhark pkg check
 
 check-source:
   python3 scripts/check_provenance.py
+  python3 scripts/generate_constants.py --check
 
 typecheck:
   futhark check --Werror tests/f32_tests.fut

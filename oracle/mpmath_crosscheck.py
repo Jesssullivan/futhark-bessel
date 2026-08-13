@@ -32,6 +32,15 @@ def main(path_text: str) -> None:
     mp.mp.dps = 100
     rows = [json.loads(line) for line in Path(path_text).read_text().splitlines()]
     for row in rows:
+        if row["kind"] == "j1_root_bracket":
+            reference = mp.besseljzero(1, row["index"])
+            lo = mp.mpf(float.fromhex(row["lo_hex"]))
+            hi = mp.mpf(float.fromhex(row["hi_hex"]))
+            if not lo < reference < hi:
+                raise SystemExit(
+                    f"mpmath root escaped Arb bracket: J1 root {row['index']}"
+                )
+            continue
         x = mp.mpf(row["x"])
         order = 0 if row["kind"] == "j0" else 1
         reference = mp.besselj(order, x)
