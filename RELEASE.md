@@ -12,6 +12,10 @@ have machine-readable evidence at the tagged commit.
       exact-real semantics. They do not claim backend floating-point bounds.
 - [ ] Floating-point rounding/reassociation bounds and observed backend error
       envelopes are recorded separately for f32 and f64.
+      A conditional source-graph analysis and sample-only regression ceilings
+      now exist. Exact range-reduction-index equality is falsified; adjacent-cell
+      composition and backend-lowering equivalence remain open, so this gate
+      stays unchecked.
 - [x] A deterministic pinned harness executes identical Arb-certified sample
       and root ledgers through the C and WASM runtimes and records observed
       absolute, ULP, and residual maxima by precision, domain, and backend.

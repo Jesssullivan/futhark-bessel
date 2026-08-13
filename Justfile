@@ -53,16 +53,23 @@ approximation-proof: _approximation-ledger
 approximation-proof-write: _approximation-ledger
   python3 scripts/approximation_proof.py --write
 
+floating-point-analysis:
+  python3 scripts/floating_point_analysis.py --check
+  PYTHONPATH=scripts python3 scripts/test_evidence_fail_closed.py
+
 backend-conformance: evidence
   python3 scripts/backend_conformance.py --check
 
 backend-conformance-write: evidence
   python3 scripts/backend_conformance.py --write
 
+observed-envelopes:
+  python3 scripts/check_observed_envelopes.py
+
 coeff-hash:
   python3 scripts/coefficient_hash.py
 
-check: fmt package check-source typecheck test-c compile-webgpu approximation-proof backend-conformance coeff-hash
+check: fmt package check-source typecheck test-c compile-webgpu approximation-proof floating-point-analysis backend-conformance observed-envelopes coeff-hash
   gitleaks dir --no-banner --redact .
 
 release-preflight: check

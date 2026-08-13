@@ -34,8 +34,20 @@
     }
   },
   "floating_point_rounding_reassociation": {
-    "status": "OPEN",
-    "note": "Requires backend-specific operation graphs and interval propagation; not inferred from oracle agreement."
+    "status": "PARTIAL_CONDITIONAL_SOURCE_GRAPH_ANALYSIS",
+    "evidence": "evidence/floating-point-analysis.json",
+    "source_graph": {
+      "series_branches": "PROVED_UNDER_DECLARED_PRIMITIVE_SEMANTICS",
+      "asymptotic_branches": "CONDITIONAL_ON_ADJACENT_REDUCTION_COMPOSITION",
+      "exact_range_reduction_index_equality": "FALSIFIED_WITH_MACHINE_CHECKED_WITNESSES",
+      "composition_with_exact_real_bound": "NOT_PERFORMED_WHILE_FLOATING_POINT_OBLIGATIONS_ARE_OPEN"
+    },
+    "backend_lowering_equivalence": {
+      "c": "OPEN",
+      "wasm": "OPEN",
+      "webgpu": "OPEN"
+    },
+    "note": "The compact exact-rational analysis is conditional on explicit IEEE round-to-nearest-even source primitives. It does not infer backend semantics from oracle agreement."
   },
   "pinned_compiler_smoke": {
     "compiler_version": "Futhark 0.27.0 prerelease",
@@ -49,12 +61,13 @@
   },
   "observed_backend_maxima": {
     "evidence_file": "evidence/backend-observations.json",
+    "declared_regression_envelopes": "evidence/observed-regression-envelopes.json",
     "c_f64": "RECORDED_FINITE_SAMPLE_BASELINE",
     "c_f32": "RECORDED_FINITE_SAMPLE_BASELINE",
     "wasm_f64": "RECORDED_FINITE_SAMPLE_BASELINE",
     "wasm_f32": "RECORDED_FINITE_SAMPLE_BASELINE",
     "webgpu_f32": null,
-    "status": "OBSERVED_BASELINE_NOT_RELEASE_CONFORMANCE"
+    "status": "OBSERVED_BASELINE_AND_SAMPLE_ONLY_ENVELOPES_NOT_RELEASE_CONFORMANCE"
   },
   "root_evidence": {
     "f64_brackets": {
@@ -63,8 +76,12 @@
       "certifier": "FLINT/Arb 3.6.0",
       "status": "CERTIFIED"
     },
-    "f32_ulp": null,
-    "f32_residual": null,
+    "f32_release_ulp_envelope": null,
+    "f32_release_residual_envelope": null,
+    "f32_observed_regression_envelope": {
+      "evidence": "evidence/observed-regression-envelopes.json",
+      "status": "OBSERVATION_ONLY_NOT_RELEASE_CONFORMANCE"
+    },
     "status": "PARTIAL"
   }
 }

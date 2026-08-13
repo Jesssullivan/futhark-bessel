@@ -11,7 +11,12 @@ sources = [
     Path("scripts/generate_constants.py"),
     Path("oracle/approximation_bounds.c"),
     Path("scripts/approximation_proof.py"),
+    Path("scripts/floating_point_analysis.py"),
+    Path("scripts/check_observed_envelopes.py"),
+    Path("scripts/test_evidence_fail_closed.py"),
     Path("evidence/real-approximation-bounds.json"),
+    Path("evidence/floating-point-analysis.json"),
+    Path("evidence/observed-regression-envelopes.json"),
     Path("evidence/provenance.json"),
     Path("evidence/error-budget.json"),
 ]

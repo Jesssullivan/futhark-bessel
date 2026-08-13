@@ -36,7 +36,23 @@ remainders, every range-reduction cell and tie, both switches and endpoints,
 trigonometric Taylor remainders, and the rounded phase/prefactor constants. Its
 committed summary is `evidence/real-approximation-bounds.json`. Backend
 floating-point rounding, contraction, and reassociation are explicitly outside
-that theorem and remain open release gates.
+that theorem.
+
+`just floating-point-analysis` separately checks exact-rational forward-error
+bounds for the written source-operation graph under explicitly declared
+round-to-nearest-even primitive semantics. The series bounds cover their source
+branches. Exact index preservation is machine-falsified at representable inputs;
+the asymptotic bounds therefore remain conditional on a proof that composes the
+two adjacent reduction cells. No source bound applies to a backend until that
+backend's lowering, contraction, and reassociation behavior is bound to an
+analyzed graph. The counterexamples and open obligations are machine-readable in
+`evidence/floating-point-analysis.json`; release remains blocked.
+
+`just observed-envelopes` checks C/WASM results on the certified finite sample
+ledger against separately declared dyadic regression ceilings in
+`evidence/observed-regression-envelopes.json`. Those ceilings are sample-only
+tripwires. They are neither inferred whole-domain bounds nor release
+conformance envelopes, and WebGPU remains unexecuted.
 
 Development is tracked under Wavegen TIN-3715. Licensed under the
 [ISC License](LICENSE).

@@ -11,6 +11,12 @@ error_budget = json.loads(Path("evidence/error-budget.json").read_text())
 approximation = json.loads(
     Path("evidence/real-approximation-bounds.json").read_text()
 )
+floating_point = json.loads(
+    Path("evidence/floating-point-analysis.json").read_text()
+)
+observed_envelopes = json.loads(
+    Path("evidence/observed-regression-envelopes.json").read_text()
+)
 
 if observations.get("status") != "OBSERVED_BASELINE_NOT_RELEASE_CONFORMANCE":
     raise SystemExit("BLOCKED: backend evidence must remain explicitly non-ratifying")
@@ -27,7 +33,7 @@ if observations.get("webgpu") != {
 if error_budget.get("release_status") != "INCOMPLETE":
     raise SystemExit("BLOCKED: error budget cannot claim release completeness")
 if error_budget.get("observed_backend_maxima", {}).get("status") != (
-    "OBSERVED_BASELINE_NOT_RELEASE_CONFORMANCE"
+    "OBSERVED_BASELINE_AND_SAMPLE_ONLY_ENVELOPES_NOT_RELEASE_CONFORMANCE"
 ):
     raise SystemExit("BLOCKED: observed maxima are not release envelopes")
 if approximation.get("status") != "CERTIFIED_EXACT_REAL_WHOLE_DOMAIN":
@@ -39,6 +45,44 @@ if approximation.get("release_implications") != {
     "real_arithmetic_mathematical_approximation": "CERTIFIED",
 }:
     raise SystemExit("BLOCKED: exact-real proof must preserve floating-point gates")
+if floating_point.get("status") != "PARTIAL_CONDITIONAL_SOURCE_GRAPH_ANALYSIS":
+    raise SystemExit("BLOCKED: floating-point analysis must remain conditional")
+if floating_point.get("release_conformance") is not False:
+    raise SystemExit("BLOCKED: conditional source analysis cannot confer conformance")
+if {item.get("status") for item in floating_point.get("open_obligations", [])} != {
+    "OPEN"
+}:
+    raise SystemExit("BLOCKED: floating-point obligations were not fail-closed")
+if len(floating_point.get("open_obligations", [])) != 4:
+    raise SystemExit("BLOCKED: expected four explicit floating-point obligations")
+expected_obligations = {
+    "FP-ADJACENT-REDUCTION-COMPOSITION",
+    "FP-BACKEND-LOWERING-C",
+    "FP-BACKEND-LOWERING-WASM",
+    "FP-BACKEND-LOWERING-WEBGPU",
+}
+if {
+    item.get("id") for item in floating_point.get("open_obligations", [])
+} != expected_obligations:
+    raise SystemExit("BLOCKED: floating-point obligation set drifted")
+for precision in ("f32", "f64"):
+    for function in ("j0", "j1"):
+        reduction = floating_point.get("range_reduction_index_analysis", {}).get(
+            precision, {}
+        ).get(function, {})
+        if reduction.get("status") != "EXACT_INDEX_EQUALITY_FALSIFIED":
+            raise SystemExit("BLOCKED: reduction-index counterevidence is missing")
+        if reduction.get("index_difference_abs_upper") != 1:
+            raise SystemExit("BLOCKED: adjacent-only reduction bound is missing")
+        witness = reduction.get("first_witness", {})
+        if witness.get("exact_real_index") == witness.get("floating_index"):
+            raise SystemExit("BLOCKED: reduction-index witness is not a counterexample")
+if observed_envelopes.get("status") != (
+    "OBSERVATION_ONLY_NOT_RELEASE_CONFORMANCE"
+):
+    raise SystemExit("BLOCKED: observed envelopes must remain sample-only")
+if observed_envelopes.get("release_conformance") is not False:
+    raise SystemExit("BLOCKED: observed envelopes cannot confer conformance")
 
 required_closed_fragments = (
     "Independent FLINT/Arb certificates",

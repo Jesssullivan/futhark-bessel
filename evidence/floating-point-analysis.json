@@ -1,0 +1,191 @@
+{
+  "authority": {
+    "analyzer": "scripts/floating_point_analysis.py",
+    "analyzer_sha256": "c3694eca6f75832c75386f9f45709f97d4022614cee3478288b5b9d194298378",
+    "arithmetic": "exact Python fractions; binary64 is used only to encode outward summary bounds",
+    "exact_real_evidence": "evidence/real-approximation-bounds.json",
+    "exact_real_evidence_sha256": "dd3db2a6a2fb40d93826a3a5f476d882ef30d2f355b41ec587926d6df055af16",
+    "implementation_sha256": "2b459fb3e24e82a825db5f44cc8b3ebe9c8387d598235f84c4e80996b4e7d9d1",
+    "implementation_source": "lib/github.com/Jesssullivan/futhark-bessel/bessel_internal.fut",
+    "module_body_sha256": {
+      "f32": "9535debcc50d3efebbdbcae34641a712c7406ed5531e06aa431048bc349a9ebe",
+      "f64": "8c9170a38e1b51529574d3c098ee1f1e2ac312a2304eff9dcf4c8367f1fe9885"
+    }
+  },
+  "conditional_results": {
+    "f32": {
+      "j0": {
+        "asymptotic": {
+          "absolute_rounding_error_upper_hex": "0x1.867a2819db2cdp-9",
+          "domain": "finite IEEE f32 inputs with 6 < |x| <= 1024",
+          "status": "CONDITIONAL_ON_ADJACENT_REDUCTION_COMPOSITION"
+        },
+        "maximum_intermediate_magnitude_upper_hex": "0x1.baf8000000000p+21",
+        "series": {
+          "absolute_rounding_error_upper_hex": "0x1.e0b23c234ebc8p-13",
+          "domain": "finite IEEE f32 inputs with |x| <= 6",
+          "status": "PROVED_UNDER_DECLARED_PRIMITIVE_SEMANTICS"
+        }
+      },
+      "j1": {
+        "asymptotic": {
+          "absolute_rounding_error_upper_hex": "0x1.96f98ae16af2dp-9",
+          "domain": "finite IEEE f32 inputs with 6 < |x| <= 1024",
+          "status": "CONDITIONAL_ON_ADJACENT_REDUCTION_COMPOSITION"
+        },
+        "maximum_intermediate_magnitude_upper_hex": "0x1.baf8000000000p+21",
+        "series": {
+          "absolute_rounding_error_upper_hex": "0x1.b3a5f7ecde66dp-13",
+          "domain": "finite IEEE f32 inputs with |x| <= 6",
+          "status": "PROVED_UNDER_DECLARED_PRIMITIVE_SEMANTICS"
+        }
+      }
+    },
+    "f64": {
+      "j0": {
+        "asymptotic": {
+          "absolute_rounding_error_upper_hex": "0x1.56d12851bc9c0p-25",
+          "domain": "finite IEEE f64 inputs with 12 < |x| <= 1024",
+          "status": "CONDITIONAL_ON_ADJACENT_REDUCTION_COMPOSITION"
+        },
+        "maximum_intermediate_magnitude_upper_hex": "0x1.7328cc0000000p+32",
+        "series": {
+          "absolute_rounding_error_upper_hex": "0x1.083b684bad197p-32",
+          "domain": "finite IEEE f64 inputs with |x| <= 12",
+          "status": "PROVED_UNDER_DECLARED_PRIMITIVE_SEMANTICS"
+        }
+      },
+      "j1": {
+        "asymptotic": {
+          "absolute_rounding_error_upper_hex": "0x1.5dff973f60be9p-25",
+          "domain": "finite IEEE f64 inputs with 12 < |x| <= 1024",
+          "status": "CONDITIONAL_ON_ADJACENT_REDUCTION_COMPOSITION"
+        },
+        "maximum_intermediate_magnitude_upper_hex": "0x1.7328cc0000000p+32",
+        "series": {
+          "absolute_rounding_error_upper_hex": "0x1.f8076ca610744p-33",
+          "domain": "finite IEEE f64 inputs with |x| <= 12",
+          "status": "PROVED_UNDER_DECLARED_PRIMITIVE_SEMANTICS"
+        }
+      }
+    }
+  },
+  "declared_primitive_semantics": {
+    "add_subtract_multiply_divide": "one IEEE-754 roundTiesToEven operation in the named precision, gradual underflow, no contraction",
+    "evaluation_order": "strict written source tree; no reassociation or common-subexpression rewrite",
+    "inputs_and_binary_literals": "exact IEEE values",
+    "per_operation_error_model": "|fl(y)-y| <= u*|y| + half_min_subnormal",
+    "round": "nearest integral value with ties to even; conversion to i32 is exact for the proven index range",
+    "sqrt": "correctly rounded IEEE-754 roundTiesToEven in the named precision"
+  },
+  "maximum_intermediate_magnitude_upper_hex": "0x1.7328cc0000000p+32",
+  "open_obligations": [
+    {
+      "id": "FP-ADJACENT-REDUCTION-COMPOSITION",
+      "statement": "Exact index equality is falsified. Prove one absolute error theorem that composes every adjacent floating reduction selection with its quadrant map, reduced-argument rounding, and both Taylor graphs.",
+      "status": "OPEN"
+    },
+    {
+      "id": "FP-BACKEND-LOWERING-C",
+      "statement": "Pinned Futhark C lowering and compiler flags implement one analyzed operation graph and the declared primitive semantics.",
+      "status": "OPEN"
+    },
+    {
+      "id": "FP-BACKEND-LOWERING-WASM",
+      "statement": "Pinned Futhark/Emscripten WASM lowering implements one analyzed operation graph and the declared primitive semantics.",
+      "status": "OPEN"
+    },
+    {
+      "id": "FP-BACKEND-LOWERING-WEBGPU",
+      "statement": "Pinned WebGPU lowering, shader compiler, adapter, and runtime implement one analyzed f32 operation graph and primitive semantics.",
+      "status": "OPEN"
+    }
+  ],
+  "proved_auxiliary_bounds": {
+    "finite_intermediates": true,
+    "range_reduction_index_abs_upper": 653
+  },
+  "range_reduction_index_analysis": {
+    "f32": {
+      "j0": {
+        "adjacent_only_proof": "The exact-rational product error is less than one, so roundTiesToEven integer results can differ by at most one.",
+        "disagreeing_edge_count": 361,
+        "edge_check_count": 1296,
+        "first_witness": {
+          "exact_real_index": 3,
+          "floating_index": 4,
+          "position": "PREDECESSOR",
+          "x_bits": "0x40c90fdb",
+          "x_hex": "0x1.921fb60000000p+2"
+        },
+        "index_difference_abs_upper": 1,
+        "method": "exact-rational check of the predecessor and first successor at every exact-real integer-transition preimage",
+        "reduction_product_error_upper_hex": "0x1.463306a30c131p-14",
+        "status": "EXACT_INDEX_EQUALITY_FALSIFIED",
+        "transition_count": 648
+      },
+      "j1": {
+        "adjacent_only_proof": "The exact-rational product error is less than one, so roundTiesToEven integer results can differ by at most one.",
+        "disagreeing_edge_count": 358,
+        "edge_check_count": 1296,
+        "first_witness": {
+          "exact_real_index": 3,
+          "floating_index": 2,
+          "position": "FIRST_SUCCESSOR",
+          "x_bits": "0x40c90fdb",
+          "x_hex": "0x1.921fb60000000p+2"
+        },
+        "index_difference_abs_upper": 1,
+        "method": "exact-rational check of the predecessor and first successor at every exact-real integer-transition preimage",
+        "reduction_product_error_upper_hex": "0x1.46b306a2dfb66p-14",
+        "status": "EXACT_INDEX_EQUALITY_FALSIFIED",
+        "transition_count": 648
+      }
+    },
+    "f64": {
+      "j0": {
+        "adjacent_only_proof": "The exact-rational product error is less than one, so roundTiesToEven integer results can differ by at most one.",
+        "disagreeing_edge_count": 348,
+        "edge_check_count": 1288,
+        "first_witness": {
+          "exact_real_index": 7,
+          "floating_index": 8,
+          "position": "PREDECESSOR",
+          "x_bits": "0x402921fb54442d17",
+          "x_hex": "0x1.921fb54442d17p+3"
+        },
+        "index_difference_abs_upper": 1,
+        "method": "exact-rational check of the predecessor and first successor at every exact-real integer-transition preimage",
+        "reduction_product_error_upper_hex": "0x1.463306dc9c884p-43",
+        "status": "EXACT_INDEX_EQUALITY_FALSIFIED",
+        "transition_count": 644
+      },
+      "j1": {
+        "adjacent_only_proof": "The exact-rational product error is less than one, so roundTiesToEven integer results can differ by at most one.",
+        "disagreeing_edge_count": 355,
+        "edge_check_count": 1288,
+        "first_witness": {
+          "exact_real_index": 7,
+          "floating_index": 8,
+          "position": "PREDECESSOR",
+          "x_bits": "0x402c463abeccb2ba",
+          "x_hex": "0x1.c463abeccb2bap+3"
+        },
+        "index_difference_abs_upper": 1,
+        "method": "exact-rational check of the predecessor and first successor at every exact-real integer-transition preimage",
+        "reduction_product_error_upper_hex": "0x1.46b306dc9c884p-43",
+        "status": "EXACT_INDEX_EQUALITY_FALSIFIED",
+        "transition_count": 644
+      }
+    }
+  },
+  "release_conformance": false,
+  "release_implication": "BLOCKED; conditional source bounds are neither backend bounds nor release envelopes",
+  "schema_version": "futhark-bessel.floating-point-analysis.v1",
+  "scope": {
+    "composition_with_exact_real_bound": "NOT_PERFORMED_WHILE_FLOATING_POINT_OBLIGATIONS_ARE_OPEN",
+    "covered": "written Futhark J0/J1 source-operation order, including gradual-underflow absolute error terms and finite-intermediate bounds",
+    "excluded": "backend lowering equivalence, contraction/reassociation, adjacent reduction-cell composition, root solver arithmetic, and runtime conformance"
+  },
+  "status": "PARTIAL_CONDITIONAL_SOURCE_GRAPH_ANALYSIS"
+}
