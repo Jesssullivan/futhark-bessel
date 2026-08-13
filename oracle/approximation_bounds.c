@@ -262,8 +262,12 @@ static void phase_components(arb_t phase_error, arb_t reduced_radius,
                    cfg->sin_first_omitted);
   taylor_remainder(cos_remainder, reduced_radius,
                    cfg->cos_first_omitted);
-  arb_add(sin_error, phase_error, sin_remainder, PREC);
-  arb_add(cos_error, phase_error, cos_remainder, PREC);
+  /* Quadrants 1 and 3 swap the sine and cosine polynomials.  Use one
+   * conservative bound for both reconstructed outputs so every quadrant is
+   * covered without assuming which Taylor tail is larger. */
+  arb_add(temporary, sin_remainder, cos_remainder, PREC);
+  arb_add(sin_error, phase_error, temporary, PREC);
+  arb_set(cos_error, sin_error);
 
   arb_set_d(max_x, DOMAIN_MAX);
   arb_sub(phase_max, max_x, offset, PREC);

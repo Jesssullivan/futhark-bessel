@@ -2,7 +2,7 @@
   "authority": {
     "certificate_ledger": "evidence/real-approximation-certificates.jsonl",
     "certificate_rows": 2608,
-    "certificate_sha256": "fe540b6c624b88e04d68a903c1492d220699b075f1673e5b37f1b88c8167ed05",
+    "certificate_sha256": "644f00f790eaf01b4b01474ec716b121e105554aff0547e5c71483ea89171a17",
     "certifier": "FLINT/Arb 3.6.0 at 1024-bit precision",
     "implementation_sha256": "2b459fb3e24e82a825db5f44cc8b3ebe9c8387d598235f84c4e80996b4e7d9d1",
     "implementation_source": "lib/github.com/Jesssullivan/futhark-bessel/bessel_internal.fut",
@@ -17,7 +17,7 @@
   "bounds": {
     "f32": {
       "j0": {
-        "asymptotic_composite_absolute_error_upper_hex": "0x1.097aa389c992dp-19",
+        "asymptotic_composite_absolute_error_upper_hex": "0x1.098e62a5c330bp-19",
         "hankel_truncation_absolute_error_upper_hex": "0x1.07df47f91c001p-19",
         "series_absolute_error_upper_hex": "0x1.259c5eae630dfp-262",
         "switch_active_branch": "series",
@@ -25,7 +25,7 @@
         "switch_series_observed_absolute_error_upper_hex": "0x1.248eb618ae6bcp-262"
       },
       "j1": {
-        "asymptotic_composite_absolute_error_upper_hex": "0x1.2a55259cf3a9ap-19",
+        "asymptotic_composite_absolute_error_upper_hex": "0x1.2a68f9343f30ep-19",
         "hankel_truncation_absolute_error_upper_hex": "0x1.296562ba61cffp-19",
         "series_absolute_error_upper_hex": "0x1.19ddcb88b1033p-266",
         "switch_active_branch": "series",
@@ -35,7 +35,7 @@
     },
     "f64": {
       "j0": {
-        "asymptotic_composite_absolute_error_upper_hex": "0x1.0b05251670c14p-34",
+        "asymptotic_composite_absolute_error_upper_hex": "0x1.0b0b7f711ceefp-34",
         "hankel_truncation_absolute_error_upper_hex": "0x1.0a9ff0440316p-34",
         "series_absolute_error_upper_hex": "0x1.a831ecb7538c4p-509",
         "switch_active_branch": "series",
@@ -43,7 +43,7 @@
         "switch_series_observed_absolute_error_upper_hex": "0x1.a69c5b5b26b6p-509"
       },
       "j1": {
-        "asymptotic_composite_absolute_error_upper_hex": "0x1.1fcb89fd1e093p-34",
+        "asymptotic_composite_absolute_error_upper_hex": "0x1.1fd4005da9863p-34",
         "hankel_truncation_absolute_error_upper_hex": "0x1.1f662c2eeeebap-34",
         "series_absolute_error_upper_hex": "0x1.9f89b8dd61843p-513",
         "switch_active_branch": "series",

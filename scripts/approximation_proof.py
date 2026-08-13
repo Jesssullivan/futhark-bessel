@@ -149,7 +149,7 @@ def recorded(text: str) -> mp.mpf:
 
 def close_upper(text: str, value: mp.mpf, label: str) -> None:
     upper = recorded(text)
-    slack = mp.mpf("1e-70") * max(mp.mpf(1), abs(value))
+    slack = max(mp.mpf("1e-300"), abs(value) * mp.mpf("1e-20"))
     if upper + slack < value:
         raise SystemExit(f"{label} is not an outward upper bound: {text} < {value}")
     if value != 0 and upper > value * mp.mpf("1.000000000001"):
@@ -211,8 +211,10 @@ def expected_components(precision: str, order: int) -> dict[str, mp.mpf | int]:
     cos_remainder = radius ** cfg["cos_first_omitted"] / mp.factorial(
         cfg["cos_first_omitted"]
     )
-    sin_error = phase_error + sin_remainder
-    cos_error = phase_error + cos_remainder
+    # The quadrant map swaps the sine and cosine polynomials for odd n.
+    # A shared bound covers both outputs without a parity assumption.
+    sin_error = phase_error + sin_remainder + cos_remainder
+    cos_error = sin_error
     prefactor = mp.sqrt(2 / (mp.pi * switch))
     prefactor_used = mp.sqrt(
         2 / (mpq(exact_hex(cfg["pi_used"])) * switch)
