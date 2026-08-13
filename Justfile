@@ -53,7 +53,19 @@ approximation-proof: _approximation-ledger
 approximation-proof-write: _approximation-ledger
   python3 scripts/approximation_proof.py --write
 
-floating-point-analysis:
+_adjacent-composition-ledger:
+  mkdir -p build evidence
+  python3 scripts/adjacent_reduction_bands.py --check
+  cc -std=c11 -O2 -Wall -Wextra -Werror oracle/adjacent_composition.c -lflint -lmpfr -lm -o build/adjacent_composition
+  build/adjacent_composition > evidence/adjacent-composition-certificates.jsonl
+
+adjacent-composition-proof: _adjacent-composition-ledger
+  python3 scripts/adjacent_composition_proof.py --check
+
+adjacent-composition-proof-write: _adjacent-composition-ledger
+  python3 scripts/adjacent_composition_proof.py --write
+
+floating-point-analysis: adjacent-composition-proof
   python3 scripts/floating_point_analysis.py --check
   PYTHONPATH=scripts python3 scripts/test_evidence_fail_closed.py
 

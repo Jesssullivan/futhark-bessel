@@ -34,20 +34,25 @@
     }
   },
   "floating_point_rounding_reassociation": {
-    "status": "PARTIAL_CONDITIONAL_SOURCE_GRAPH_ANALYSIS",
+    "status": "SOURCE_EVALUATION_PROVED_BACKEND_LOWERING_OPEN",
     "evidence": "evidence/floating-point-analysis.json",
+    "adjacent_composition_evidence": "evidence/adjacent-composition-proof.json",
+    "transition_band_authority": "evidence/adjacent-reduction-bands.json",
     "source_graph": {
-      "series_branches": "PROVED_UNDER_DECLARED_PRIMITIVE_SEMANTICS",
-      "asymptotic_branches": "CONDITIONAL_ON_ADJACENT_REDUCTION_COMPOSITION",
+      "series_branches": "PROVED_AND_COMPOSED_UNDER_DECLARED_PRIMITIVE_SEMANTICS",
+      "asymptotic_branches": "PROVED_AND_COMPOSED_UNDER_DECLARED_PRIMITIVE_SEMANTICS",
       "exact_range_reduction_index_equality": "FALSIFIED_WITH_MACHINE_CHECKED_WITNESSES",
-      "composition_with_exact_real_bound": "NOT_PERFORMED_WHILE_FLOATING_POINT_OBLIGATIONS_ARE_OPEN"
+      "complete_floating_transition_band_census": "PROVED_EXACT_RATIONAL",
+      "adjacent_reduction_composition": "PROVED_WITH_FLINT_ARB_AND_INDEPENDENT_MPMATH_VERIFICATION",
+      "composition_with_mathematical_bound": "PROVED_VIA_SHADOW_INDEX_QUADRANT_THEOREM",
+      "root_solver_arithmetic": "OPEN"
     },
     "backend_lowering_equivalence": {
       "c": "OPEN",
       "wasm": "OPEN",
       "webgpu": "OPEN"
     },
-    "note": "The compact exact-rational analysis is conditional on explicit IEEE round-to-nearest-even source primitives. It does not infer backend semantics from oracle agreement."
+    "note": "The source proof is conditional only on its explicitly declared IEEE round-to-nearest-even primitives and strict operation tree. It does not infer C, WASM, or WebGPU lowering semantics from oracle agreement."
   },
   "pinned_compiler_smoke": {
     "compiler_version": "Futhark 0.27.0 prerelease",

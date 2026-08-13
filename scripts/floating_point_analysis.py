@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: ISC
-"""Check conditional source-graph floating-point error bounds.
+"""Check source-graph floating-point error bounds.
 
 This is deliberately not a backend proof.  It analyzes the written Futhark
 operation order under the primitive semantics declared in the emitted record.
-Backend lowering equivalence and adjacent reduction-cell composition are
-separate, fail-closed obligations.
+The adjacent reduction-cell theorem is independently certified and composed
+here.  Backend lowering equivalence and root arithmetic remain separate,
+fail-closed obligations.
 """
 
 from __future__ import annotations
@@ -15,7 +16,6 @@ import hashlib
 import json
 import math
 import re
-import struct
 from dataclasses import dataclass
 from fractions import Fraction
 from pathlib import Path
@@ -26,6 +26,8 @@ IMPLEMENTATION = Path(
 )
 ANALYZER = Path("scripts/floating_point_analysis.py")
 EXACT_REAL = Path("evidence/real-approximation-bounds.json")
+ADJACENT_PROOF = Path("evidence/adjacent-composition-proof.json")
+TRANSITION_BANDS = Path("evidence/adjacent-reduction-bands.json")
 OUTPUT = Path("evidence/floating-point-analysis.json")
 EXPECTED_IMPLEMENTATION_SHA256 = (
     "2b459fb3e24e82a825db5f44cc8b3ebe9c8387d598235f84c4e80996b4e7d9d1"
@@ -165,157 +167,6 @@ def power_of_two_sqrt_upper(value: Fraction) -> Fraction:
     return Fraction(2) ** exponent
 
 
-def nearest_integer(value: Fraction) -> int:
-    floor = value.numerator // value.denominator
-    remainder = value - floor
-    if remainder < Fraction(1, 2):
-        return floor
-    if remainder > Fraction(1, 2):
-        return floor + 1
-    return floor if floor % 2 == 0 else floor + 1
-
-
-def floor_log2(value: Fraction) -> int:
-    exponent = value.numerator.bit_length() - value.denominator.bit_length()
-    if Fraction(2) ** exponent > value:
-        exponent -= 1
-    while Fraction(2) ** (exponent + 1) <= value:
-        exponent += 1
-    return exponent
-
-
-def round_positive_normal(value: Fraction, fmt: Format) -> Fraction:
-    """Exact RN-even for the positive normal values used by reduction."""
-
-    if value <= 0:
-        raise ValueError("positive value required")
-    spacing = Fraction(2) ** (floor_log2(value) - (fmt.precision - 1))
-    return nearest_integer(value / spacing) * spacing
-
-
-def float_bits(value: Fraction, fmt: Format) -> int:
-    """Encode an exactly checked normal RN-even conversion."""
-
-    if fmt.name == "f32":
-        bits = struct.unpack(">I", struct.pack(">f", float(value)))[0]
-    else:
-        bits = struct.unpack(">Q", struct.pack(">d", float(value)))[0]
-    if bits_fraction(bits, fmt) != round_positive_normal(value, fmt):
-        raise SystemExit(f"host conversion disagrees with exact {fmt.name} rounding")
-    return bits
-
-
-def bits_fraction(bits: int, fmt: Format) -> Fraction:
-    if fmt.name == "f32":
-        value = struct.unpack(">f", struct.pack(">I", bits))[0]
-    else:
-        value = struct.unpack(">d", struct.pack(">Q", bits))[0]
-    return Fraction(*value.as_integer_ratio())
-
-
-def reduced_index_exact(x: Fraction, offset: Fraction, c: Fraction) -> int:
-    return nearest_integer((x - offset) * c)
-
-
-def reduced_index_floating(
-    x: Fraction, offset: Fraction, c: Fraction, fmt: Format
-) -> int:
-    phase = round_positive_normal(x - offset, fmt)
-    product = round_positive_normal(phase * c, fmt)
-    return nearest_integer(product)
-
-
-def transition_edge_analysis(fmt: Format, order: int) -> dict[str, Any]:
-    """Test every exact-real integer transition and retain the first witness."""
-
-    cfg = CONFIGS[fmt.name]
-    offset = exact_hex(cfg["offsets"][order])
-    c = exact_hex(cfg["two_over_pi"])
-    switch_bits = float_bits(cfg["switch"], fmt)
-    end_bits = float_bits(Fraction(1024), fmt)
-    start_bits = switch_bits + 1
-    start = bits_fraction(start_bits, fmt)
-    end = bits_fraction(end_bits, fmt)
-    first_index = reduced_index_exact(start, offset, c)
-    last_index = reduced_index_exact(end, offset, c)
-    if reduced_index_floating(start, offset, c, fmt) != first_index:
-        raise SystemExit(f"{fmt.name}/J{order} start index disagrees")
-    if reduced_index_floating(end, offset, c, fmt) != last_index:
-        raise SystemExit(f"{fmt.name}/J{order} end index disagrees")
-
-    transitions = 0
-    edge_checks = 0
-    disagreements = 0
-    first_witness: dict[str, Any] | None = None
-    width = 8 if fmt.name == "f32" else 16
-    for lower_index in range(first_index, last_index):
-        boundary = Fraction(2 * lower_index + 1, 2)
-        preimage = offset + boundary / c
-        if not start <= preimage <= end:
-            continue
-        nearby = float_bits(preimage, fmt)
-        candidates = [
-            (bits, bits_fraction(bits, fmt))
-            for bits in range(nearby - 8, nearby + 9)
-        ]
-        below = max(
-            (item for item in candidates if item[1] <= preimage),
-            key=lambda item: item[1],
-        )
-        above = min(
-            (item for item in candidates if item[1] >= preimage),
-            key=lambda item: item[1],
-        )
-        if below[0] != above[0] and above[0] != below[0] + 1:
-            raise SystemExit(f"{fmt.name}/J{order} transition bracket is not adjacent")
-        exact_tie = below[0] == above[0]
-        if exact_tie and lower_index % 2 == 1:
-            predecessor = (below[0] - 1, bits_fraction(below[0] - 1, fmt))
-            first = below
-        elif exact_tie:
-            predecessor = below
-            first = (below[0] + 1, bits_fraction(below[0] + 1, fmt))
-        else:
-            predecessor = below
-            first = above
-
-        for position, candidate, expected in (
-            ("PREDECESSOR", predecessor, lower_index),
-            ("FIRST_SUCCESSOR", first, lower_index + 1),
-        ):
-            exact_index = reduced_index_exact(candidate[1], offset, c)
-            floating_index = reduced_index_floating(candidate[1], offset, c, fmt)
-            if exact_index != expected:
-                raise SystemExit(f"{fmt.name}/J{order} exact transition proof failed")
-            if abs(floating_index - exact_index) > 1:
-                raise SystemExit(f"{fmt.name}/J{order} non-adjacent reduction index")
-            if floating_index != exact_index:
-                disagreements += 1
-                if first_witness is None:
-                    first_witness = {
-                        "x_bits": f"0x{candidate[0]:0{width}x}",
-                        "x_hex": float(candidate[1]).hex(),
-                        "position": position,
-                        "exact_real_index": exact_index,
-                        "floating_index": floating_index,
-                    }
-            edge_checks += 1
-        transitions += 1
-    if first_witness is None:
-        raise SystemExit(f"{fmt.name}/J{order} expected index-equality witness missing")
-    return {
-        "status": "EXACT_INDEX_EQUALITY_FALSIFIED",
-        "method": (
-            "exact-rational check of the predecessor and first successor at "
-            "every exact-real integer-transition preimage"
-        ),
-        "transition_count": transitions,
-        "edge_check_count": edge_checks,
-        "disagreeing_edge_count": disagreements,
-        "first_witness": first_witness,
-    }
-
-
 def series_bound(fmt: Format, order: int) -> tuple[State, Fraction]:
     cfg = CONFIGS[fmt.name]
     x = exact(cfg["switch"])
@@ -371,8 +222,10 @@ def taylor_bound(fmt: Format, r: State, sine: bool) -> tuple[State, Fraction]:
     return result, maximum
 
 
-def reduction_bound(fmt: Format, order: int) -> tuple[State, Fraction, Fraction]:
-    """Bound one selected reduction cell for later adjacent-cell composition."""
+def reduction_bound(
+    fmt: Format, order: int, shadow_radius: Fraction
+) -> tuple[State, Fraction, Fraction]:
+    """Bound rounding against the exact shadow graph for either adjacent index."""
 
     cfg = CONFIGS[fmt.name]
     x = exact(Fraction(1024))
@@ -388,9 +241,9 @@ def reduction_bound(fmt: Format, order: int) -> tuple[State, Fraction, Fraction]
     product = mul(fmt, phase, exact(exact_hex(cfg["two_over_pi"])))
     maximum = max(phase.floating, product.floating)
 
-    # Exact reduction-index equality is false at some representable inputs.
-    # This same-index graph is only one side of the open adjacent-cell theorem,
-    # which must compose both quadrant maps and both Taylor graphs.
+    # Exact index equality is false.  The adjacent theorem independently proves
+    # that the source-selected shadow index has |n| <= 653 and that its exact
+    # reduced argument is bounded by shadow_radius.
     n = exact(653)
     current = phase
     for component in cfg["pio2"]:
@@ -398,10 +251,9 @@ def reduction_bound(fmt: Format, order: int) -> tuple[State, Fraction, Fraction]
         current = add(fmt, current, n_component)
         maximum = max(maximum, n_component.floating, current.floating)
 
-    certified_real_radius = exact_hex(cfg["reduced_bounds"][order])
     r = State(
-        certified_real_radius,
-        certified_real_radius + current.error,
+        shadow_radius,
+        shadow_radius + current.error,
         current.error,
     )
     return r, max(maximum, r.floating), product.error
@@ -475,8 +327,12 @@ def prefactor_bound(fmt: Format) -> tuple[State, Fraction]:
     return state, max(t_fp_max, reciprocal_fp_max, state.floating)
 
 
-def asymptotic_bound(fmt: Format, order: int) -> tuple[State, Fraction, Fraction]:
-    r, reduction_max, reduction_product_error = reduction_bound(fmt, order)
+def asymptotic_bound(
+    fmt: Format, order: int, shadow_radius: Fraction
+) -> tuple[State, Fraction, Fraction]:
+    r, reduction_max, reduction_product_error = reduction_bound(
+        fmt, order, shadow_radius
+    )
     sine, sine_max = taylor_bound(fmt, r, True)
     cosine, cosine_max = taylor_bound(fmt, r, False)
     # Quadrant selection can exchange sine/cosine.  Use a shared component
@@ -545,9 +401,64 @@ def verify_source() -> tuple[str, dict[str, str]]:
     return digest, module_hashes
 
 
-def generate() -> dict[str, Any]:
-    implementation_sha, module_hashes = verify_source()
-    exact_real = json.loads(EXACT_REAL.read_text())
+def load_adjacent_proof(implementation_sha: str) -> dict[str, Any]:
+    proof_raw = ADJACENT_PROOF.read_bytes()
+    proof = json.loads(proof_raw)
+    if proof.get("schema_version") != (
+        "futhark-bessel.adjacent-composition-proof.v1"
+    ):
+        raise SystemExit("unexpected adjacent composition proof schema")
+    if proof.get("status") != "ADJACENT_REDUCTION_COMPOSITION_PROVED":
+        raise SystemExit("adjacent reduction composition is not proved")
+    if proof.get("release_implications") != {
+        "adjacent_source_reduction_composition": "PROVED",
+        "backend_lowering_equivalence": "OPEN",
+        "overall_release_status": "INCOMPLETE",
+        "root_solver_arithmetic": "OPEN",
+    }:
+        raise SystemExit("adjacent proof release implications drifted")
+    authority = proof.get("authority", {})
+    expected_files = {
+        "transition_bands": TRANSITION_BANDS,
+        "transition_generator": Path("scripts/adjacent_reduction_bands.py"),
+        "certifier_source": Path("oracle/adjacent_composition.c"),
+        "independent_verifier": Path("scripts/adjacent_composition_proof.py"),
+        "exact_real_evidence": Path("evidence/real-approximation-bounds.json"),
+    }
+    if (
+        authority.get("implementation_source") != str(IMPLEMENTATION)
+        or authority.get("implementation_sha256") != implementation_sha
+    ):
+        raise SystemExit("adjacent proof implementation authority drifted")
+    for field, path in expected_files.items():
+        if authority.get(field) != str(path):
+            raise SystemExit(f"adjacent proof {field} path drifted")
+        if authority.get(f"{field}_sha256") != hashlib.sha256(
+            path.read_bytes()
+        ).hexdigest():
+            raise SystemExit(f"adjacent proof {field} hash drifted")
+    if (
+        authority.get("certificate_rows") != 36
+        or authority.get("certifier") != "FLINT/Arb 3.6.0 at 1024-bit precision"
+        or authority.get("independent_verifier_runtime")
+        != "mpmath 1.4.1 at 180 decimal digits"
+    ):
+        raise SystemExit("adjacent proof certificate authority drifted")
+    census = proof.get("transition_census", {})
+    if sum(
+        census.get(precision, {}).get(f"j{order}", {}).get(
+            "transition_band_count", 0
+        )
+        for precision in ("f32", "f64")
+        for order in (0, 1)
+    ) != 2584:
+        raise SystemExit("adjacent proof floating transition-band census drifted")
+    return proof
+
+
+def validate_exact_real(
+    exact_real: dict[str, Any], implementation_sha: str
+) -> None:
     expected_scope = {
         "covered": (
             "series and Hankel truncation, phase constants, exhaustive "
@@ -590,8 +501,26 @@ def generate() -> dict[str, Any]:
                 "both adjacent quadrants certified"
             ):
                 raise SystemExit(f"{precision}/J{order} tie policy drifted")
+
+
+def generate() -> dict[str, Any]:
+    implementation_sha, module_hashes = verify_source()
+    exact_real = json.loads(EXACT_REAL.read_text())
+    validate_exact_real(exact_real, implementation_sha)
+    adjacent_proof = load_adjacent_proof(implementation_sha)
     results: dict[str, Any] = {}
     reduction_evidence: dict[str, Any] = {}
+    transition_document = json.loads(TRANSITION_BANDS.read_text())
+    transition_cases = {
+        (case.get("precision"), case.get("order")): case
+        for case in transition_document.get("cases", [])
+    }
+    if set(transition_cases) != {
+        (precision, order)
+        for precision in ("f32", "f64")
+        for order in (0, 1)
+    }:
+        raise SystemExit("floating transition-band cases drifted")
     maximum_intermediate = Fraction(0)
     for precision, fmt in FORMATS.items():
         results[precision] = {}
@@ -608,29 +537,85 @@ def generate() -> dict[str, Any]:
             )
         )
         for order in (0, 1):
+            name = f"j{order}"
+            adjacent_bound = adjacent_proof.get("bounds", {}).get(
+                precision, {}
+            ).get(name, {})
+            shadow_radius = exact_hex(
+                adjacent_bound.get("shadow_reduction_radius_upper_hex", "nan")
+            )
             series, series_max = series_bound(fmt, order)
             asymptotic, asymptotic_max, reduction_product_error = asymptotic_bound(
-                fmt, order
+                fmt, order, shadow_radius
             )
-            if reduction_product_error >= 1:
+            accepted_product_error = adjacent_bound.get(
+                "accepted_product_error_upper_hex"
+            )
+            if (
+                accepted_product_error != upward_float_hex(reduction_product_error)
+                or exact_hex(accepted_product_error) >= Fraction(1, 4)
+            ):
                 raise SystemExit(
-                    f"{precision}/J{order} cannot prove adjacent-only reduction"
+                    f"{precision}/J{order} accepted transition-band eta drifted"
                 )
-            transition_analysis = transition_edge_analysis(fmt, order)
-            transition_analysis["reduction_product_error_upper_hex"] = (
-                upward_float_hex(reduction_product_error)
+            census = adjacent_proof.get("transition_census", {}).get(
+                precision, {}
+            ).get(name, {})
+            transition_case = transition_cases[(precision, order)]
+            first = transition_case.get("partition", {}).get(
+                "first_mismatch_witness", {}
             )
-            transition_analysis["index_difference_abs_upper"] = 1
-            transition_analysis["adjacent_only_proof"] = (
-                "The exact-rational product error is less than one, so "
-                "roundTiesToEven integer results can differ by at most one."
-            )
-            reduction_evidence[precision][f"j{order}"] = transition_analysis
+            if first.get("exact_index") == first.get("floating_index"):
+                raise SystemExit(f"{precision}/J{order} mismatch witness drifted")
+            reduction_evidence[precision][name] = {
+                "status": "EXACT_INDEX_EQUALITY_FALSIFIED",
+                "composition_status": "ADJACENT_REDUCTION_COMPOSITION_PROVED",
+                "method": (
+                    "complete exact-rational disjoint transition-band partition; "
+                    "all in-band IEEE candidates and complete mismatch bit spans"
+                ),
+                "accepted_product_error_upper_hex": accepted_product_error,
+                "index_difference_abs_upper": 1,
+                "transition_band_count": census.get("transition_band_count"),
+                "stable_interior_count": census.get("stable_interior_count"),
+                "candidate_count": census.get("candidate_count"),
+                "mismatch_count": census.get("mismatch_count"),
+                "mismatch_span_count": census.get("mismatch_span_count"),
+                "first_witness": {
+                    "x_bits": first.get("x_bits"),
+                    "x_hex": first.get("x_hex"),
+                    "exact_real_index": first.get("exact_index"),
+                    "floating_index": first.get("floating_index"),
+                },
+                "shadow_reduction_radius_upper_hex": adjacent_bound.get(
+                    "shadow_reduction_radius_upper_hex"
+                ),
+                "transition_band_authority_sha256": adjacent_proof.get(
+                    "authority", {}
+                ).get("transition_bands_sha256"),
+                "adjacent_only_proof": (
+                    "accepted eta is less than 1/4; outside the disjoint bands "
+                    "m=n, and inside B_k both indices lie in {k,k+1}."
+                ),
+                "stable_interior_proof": (
+                    "Every point outside the closed transition bands lies in "
+                    "one common roundTiesToEven integer cell for z and zhat."
+                ),
+            }
             maximum = max(series_max, asymptotic_max, source_scalar_maximum)
             maximum_intermediate = max(maximum_intermediate, maximum)
             if maximum >= exact_hex(fmt.maximum_finite_hex):
                 raise SystemExit(f"{precision}/J{order} finite-intermediate proof failed")
-            results[precision][f"j{order}"] = {
+            exact_real_bound = exact_real.get("bounds", {}).get(
+                precision, {}
+            ).get(name, {})
+            series_math = exact_hex(
+                exact_real_bound.get("series_absolute_error_upper_hex", "nan")
+            )
+            shadow_math = exact_hex(
+                adjacent_bound.get("shadow_math_absolute_error_upper_hex", "nan")
+            )
+            results[precision][name] = {
                 "series": {
                     "status": "PROVED_UNDER_DECLARED_PRIMITIVE_SEMANTICS",
                     "domain": (
@@ -638,35 +623,54 @@ def generate() -> dict[str, Any]:
                         f"{CONFIGS[precision]['switch']}"
                     ),
                     "absolute_rounding_error_upper_hex": upward_float_hex(series.error),
+                    "mathematical_approximation_error_upper_hex": (
+                        exact_real_bound.get("series_absolute_error_upper_hex")
+                    ),
+                    "absolute_source_error_upper_hex": upward_float_hex(
+                        series.error + series_math
+                    ),
                 },
                 "asymptotic": {
-                    "status": "CONDITIONAL_ON_ADJACENT_REDUCTION_COMPOSITION",
+                    "status": "PROVED_UNDER_DECLARED_PRIMITIVE_SEMANTICS",
                     "domain": (
                         f"finite IEEE {precision} inputs with "
                         f"{CONFIGS[precision]['switch']} < |x| <= 1024"
                     ),
                     "absolute_rounding_error_upper_hex": upward_float_hex(asymptotic.error),
+                    "shadow_math_approximation_error_upper_hex": adjacent_bound.get(
+                        "shadow_math_absolute_error_upper_hex"
+                    ),
+                    "absolute_source_error_upper_hex": upward_float_hex(
+                        asymptotic.error + shadow_math
+                    ),
+                    "shadow_reduction_radius_upper_hex": adjacent_bound.get(
+                        "shadow_reduction_radius_upper_hex"
+                    ),
+                    "adjacent_quadrant_certificate_rows": adjacent_bound.get(
+                        "adjacent_quadrant_certificate_rows"
+                    ),
                 },
                 "maximum_intermediate_magnitude_upper_hex": upward_float_hex(maximum),
             }
     analyzer_sha = hashlib.sha256(ANALYZER.read_bytes()).hexdigest()
     exact_real_sha = hashlib.sha256(EXACT_REAL.read_bytes()).hexdigest()
     return {
-        "schema_version": "futhark-bessel.floating-point-analysis.v1",
-        "status": "PARTIAL_CONDITIONAL_SOURCE_GRAPH_ANALYSIS",
+        "schema_version": "futhark-bessel.floating-point-analysis.v2",
+        "status": "SOURCE_EVALUATION_PROVED_BACKEND_LOWERING_OPEN",
         "release_conformance": False,
         "scope": {
             "covered": (
                 "written Futhark J0/J1 source-operation order, including "
-                "gradual-underflow absolute error terms and finite-intermediate bounds"
+                "gradual-underflow absolute error terms, finite intermediates, "
+                "the complete adjacent reduction partition, all quadrant maps, "
+                "and composition with mathematical approximation bounds"
             ),
             "excluded": (
-                "backend lowering equivalence, contraction/reassociation, adjacent "
-                "reduction-cell composition, root solver arithmetic, and runtime "
-                "conformance"
+                "backend lowering equivalence, contraction/reassociation, root "
+                "solver arithmetic, and runtime conformance"
             ),
             "composition_with_exact_real_bound": (
-                "NOT_PERFORMED_WHILE_FLOATING_POINT_OBLIGATIONS_ARE_OPEN"
+                "PROVED_VIA_SHADOW_INDEX_ADJACENT_QUADRANT_COMPOSITION"
             ),
         },
         "authority": {
@@ -677,6 +681,14 @@ def generate() -> dict[str, Any]:
             "analyzer_sha256": analyzer_sha,
             "exact_real_evidence": str(EXACT_REAL),
             "exact_real_evidence_sha256": exact_real_sha,
+            "adjacent_composition_proof": str(ADJACENT_PROOF),
+            "adjacent_composition_proof_sha256": hashlib.sha256(
+                ADJACENT_PROOF.read_bytes()
+            ).hexdigest(),
+            "transition_band_authority": str(TRANSITION_BANDS),
+            "transition_band_authority_sha256": hashlib.sha256(
+                TRANSITION_BANDS.read_bytes()
+            ).hexdigest(),
             "arithmetic": (
                 "exact Python fractions; binary64 is used only to encode outward "
                 "summary bounds"
@@ -699,22 +711,31 @@ def generate() -> dict[str, Any]:
             ),
             "per_operation_error_model": "|fl(y)-y| <= u*|y| + half_min_subnormal",
         },
-        "conditional_results": results,
+        "source_graph_results": results,
         "range_reduction_index_analysis": reduction_evidence,
         "proved_auxiliary_bounds": {
             "range_reduction_index_abs_upper": 653,
             "finite_intermediates": True,
         },
         "maximum_intermediate_magnitude_upper_hex": upward_float_hex(maximum_intermediate),
-        "open_obligations": [
+        "closed_obligations": [
             {
                 "id": "FP-ADJACENT-REDUCTION-COMPOSITION",
+                "status": "PROVED",
+                "statement": (
+                    "Every exact-rational floating transition band, both "
+                    "adjacent selected quadrants, the shadow radius, and the "
+                    "Taylor/phase/Hankel composition are certified."
+                ),
+            }
+        ],
+        "open_obligations": [
+            {
+                "id": "FP-ROOT-SOLVER-ARITHMETIC",
                 "status": "OPEN",
                 "statement": (
-                    "Exact index equality is falsified. Prove one absolute error "
-                    "theorem that composes every adjacent floating reduction "
-                    "selection with its quadrant map, reduced-argument rounding, "
-                    "and both Taylor graphs."
+                    "Bind the bracketed root solver's source arithmetic and "
+                    "stopping logic to certified root ULP/residual envelopes."
                 ),
             },
             {
@@ -743,8 +764,8 @@ def generate() -> dict[str, Any]:
             },
         ],
         "release_implication": (
-            "BLOCKED; conditional source bounds are neither backend bounds nor "
-            "release envelopes"
+            "BLOCKED; source-graph evaluation proofs are not backend-lowering "
+            "proofs or release envelopes, and root arithmetic remains open"
         ),
     }
 
@@ -766,8 +787,8 @@ def main() -> None:
             "scripts/floating_point_analysis.py --write"
         )
     print(
-        "OK conditional source-graph rounding bounds; release remains BLOCKED "
-        "on adjacent-cell composition and backend-lowering obligations"
+        "OK source evaluation and adjacent composition bounds; release remains "
+        "BLOCKED on backend lowering and root arithmetic"
     )
 
 

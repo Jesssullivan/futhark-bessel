@@ -10,12 +10,17 @@ have machine-readable evidence at the tagged commit.
 - [x] Mathematical series, Hankel, phase-reduction, trigonometric-Taylor, and
       prefactor bounds cover the complete finite domain for f32 and f64 under
       exact-real semantics. They do not claim backend floating-point bounds.
+- [x] An exact-rational census covers all 2,584 floating transition bands and
+      their stable interiors; FLINT/Arb plus an independent mpmath verifier
+      compose both adjacent quadrants through the shadow-index Taylor, phase,
+      Hankel, and prefactor bounds. These bands are not the canonical exact-real
+      boundaries recorded by the separate approximation theorem.
 - [ ] Floating-point rounding/reassociation bounds and observed backend error
       envelopes are recorded separately for f32 and f64.
-      A conditional source-graph analysis and sample-only regression ceilings
-      now exist. Exact range-reduction-index equality is falsified; adjacent-cell
-      composition and backend-lowering equivalence remain open, so this gate
-      stays unchecked.
+      Source-evaluation bounds and sample-only regression ceilings now exist.
+      Exact range-reduction-index equality is falsified and its adjacent-cell
+      composition is proved. Backend-lowering equivalence, root arithmetic, and
+      release envelopes remain open, so this gate stays unchecked.
 - [x] A deterministic pinned harness executes identical Arb-certified sample
       and root ledgers through the C and WASM runtimes and records observed
       absolute, ULP, and residual maxima by precision, domain, and backend.

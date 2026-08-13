@@ -14,6 +14,9 @@ approximation = json.loads(
 floating_point = json.loads(
     Path("evidence/floating-point-analysis.json").read_text()
 )
+adjacent = json.loads(
+    Path("evidence/adjacent-composition-proof.json").read_text()
+)
 observed_envelopes = json.loads(
     Path("evidence/observed-regression-envelopes.json").read_text()
 )
@@ -45,10 +48,31 @@ if approximation.get("release_implications") != {
     "real_arithmetic_mathematical_approximation": "CERTIFIED",
 }:
     raise SystemExit("BLOCKED: exact-real proof must preserve floating-point gates")
-if floating_point.get("status") != "PARTIAL_CONDITIONAL_SOURCE_GRAPH_ANALYSIS":
-    raise SystemExit("BLOCKED: floating-point analysis must remain conditional")
+if floating_point.get("status") != "SOURCE_EVALUATION_PROVED_BACKEND_LOWERING_OPEN":
+    raise SystemExit("BLOCKED: source proof/backend-lowering boundary drifted")
 if floating_point.get("release_conformance") is not False:
-    raise SystemExit("BLOCKED: conditional source analysis cannot confer conformance")
+    raise SystemExit("BLOCKED: source analysis cannot confer backend conformance")
+if adjacent.get("status") != "ADJACENT_REDUCTION_COMPOSITION_PROVED":
+    raise SystemExit("BLOCKED: adjacent reduction composition proof is missing")
+if adjacent.get("release_implications") != {
+    "adjacent_source_reduction_composition": "PROVED",
+    "backend_lowering_equivalence": "OPEN",
+    "overall_release_status": "INCOMPLETE",
+    "root_solver_arithmetic": "OPEN",
+}:
+    raise SystemExit("BLOCKED: adjacent proof release boundary drifted")
+if floating_point.get("closed_obligations") != [
+    {
+        "id": "FP-ADJACENT-REDUCTION-COMPOSITION",
+        "statement": (
+            "Every exact-rational floating transition band, both adjacent "
+            "selected quadrants, the shadow radius, and the Taylor/phase/Hankel "
+            "composition are certified."
+        ),
+        "status": "PROVED",
+    }
+]:
+    raise SystemExit("BLOCKED: adjacent composition obligation closure drifted")
 if {item.get("status") for item in floating_point.get("open_obligations", [])} != {
     "OPEN"
 }:
@@ -56,7 +80,7 @@ if {item.get("status") for item in floating_point.get("open_obligations", [])} !
 if len(floating_point.get("open_obligations", [])) != 4:
     raise SystemExit("BLOCKED: expected four explicit floating-point obligations")
 expected_obligations = {
-    "FP-ADJACENT-REDUCTION-COMPOSITION",
+    "FP-ROOT-SOLVER-ARITHMETIC",
     "FP-BACKEND-LOWERING-C",
     "FP-BACKEND-LOWERING-WASM",
     "FP-BACKEND-LOWERING-WEBGPU",
@@ -74,6 +98,20 @@ for precision in ("f32", "f64"):
             raise SystemExit("BLOCKED: reduction-index counterevidence is missing")
         if reduction.get("index_difference_abs_upper") != 1:
             raise SystemExit("BLOCKED: adjacent-only reduction bound is missing")
+        if reduction.get("composition_status") != (
+            "ADJACENT_REDUCTION_COMPOSITION_PROVED"
+        ):
+            raise SystemExit("BLOCKED: adjacent reduction composition is missing")
+        if not all(
+            isinstance(reduction.get(field), int) and reduction[field] > 0
+            for field in (
+                "transition_band_count",
+                "candidate_count",
+                "mismatch_count",
+                "mismatch_span_count",
+            )
+        ):
+            raise SystemExit("BLOCKED: complete transition census is missing")
         witness = reduction.get("first_witness", {})
         if witness.get("exact_real_index") == witness.get("floating_index"):
             raise SystemExit("BLOCKED: reduction-index witness is not a counterexample")

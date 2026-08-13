@@ -1,7 +1,9 @@
 {
   "authority": {
+    "adjacent_composition_proof": "evidence/adjacent-composition-proof.json",
+    "adjacent_composition_proof_sha256": "45f119aa0fc5f78af50ada43f087786f6b4a797894ad51e7036606d0d33082ff",
     "analyzer": "scripts/floating_point_analysis.py",
-    "analyzer_sha256": "c3694eca6f75832c75386f9f45709f97d4022614cee3478288b5b9d194298378",
+    "analyzer_sha256": "c421961029e3dcf50b15e39d26102b8945f7bb7ea0301913af73d8a3d5e12c35",
     "arithmetic": "exact Python fractions; binary64 is used only to encode outward summary bounds",
     "exact_real_evidence": "evidence/real-approximation-bounds.json",
     "exact_real_evidence_sha256": "dd3db2a6a2fb40d93826a3a5f476d882ef30d2f355b41ec587926d6df055af16",
@@ -10,66 +12,17 @@
     "module_body_sha256": {
       "f32": "9535debcc50d3efebbdbcae34641a712c7406ed5531e06aa431048bc349a9ebe",
       "f64": "8c9170a38e1b51529574d3c098ee1f1e2ac312a2304eff9dcf4c8367f1fe9885"
-    }
-  },
-  "conditional_results": {
-    "f32": {
-      "j0": {
-        "asymptotic": {
-          "absolute_rounding_error_upper_hex": "0x1.867a2819db2cdp-9",
-          "domain": "finite IEEE f32 inputs with 6 < |x| <= 1024",
-          "status": "CONDITIONAL_ON_ADJACENT_REDUCTION_COMPOSITION"
-        },
-        "maximum_intermediate_magnitude_upper_hex": "0x1.baf8000000000p+21",
-        "series": {
-          "absolute_rounding_error_upper_hex": "0x1.e0b23c234ebc8p-13",
-          "domain": "finite IEEE f32 inputs with |x| <= 6",
-          "status": "PROVED_UNDER_DECLARED_PRIMITIVE_SEMANTICS"
-        }
-      },
-      "j1": {
-        "asymptotic": {
-          "absolute_rounding_error_upper_hex": "0x1.96f98ae16af2dp-9",
-          "domain": "finite IEEE f32 inputs with 6 < |x| <= 1024",
-          "status": "CONDITIONAL_ON_ADJACENT_REDUCTION_COMPOSITION"
-        },
-        "maximum_intermediate_magnitude_upper_hex": "0x1.baf8000000000p+21",
-        "series": {
-          "absolute_rounding_error_upper_hex": "0x1.b3a5f7ecde66dp-13",
-          "domain": "finite IEEE f32 inputs with |x| <= 6",
-          "status": "PROVED_UNDER_DECLARED_PRIMITIVE_SEMANTICS"
-        }
-      }
     },
-    "f64": {
-      "j0": {
-        "asymptotic": {
-          "absolute_rounding_error_upper_hex": "0x1.56d12851bc9c0p-25",
-          "domain": "finite IEEE f64 inputs with 12 < |x| <= 1024",
-          "status": "CONDITIONAL_ON_ADJACENT_REDUCTION_COMPOSITION"
-        },
-        "maximum_intermediate_magnitude_upper_hex": "0x1.7328cc0000000p+32",
-        "series": {
-          "absolute_rounding_error_upper_hex": "0x1.083b684bad197p-32",
-          "domain": "finite IEEE f64 inputs with |x| <= 12",
-          "status": "PROVED_UNDER_DECLARED_PRIMITIVE_SEMANTICS"
-        }
-      },
-      "j1": {
-        "asymptotic": {
-          "absolute_rounding_error_upper_hex": "0x1.5dff973f60be9p-25",
-          "domain": "finite IEEE f64 inputs with 12 < |x| <= 1024",
-          "status": "CONDITIONAL_ON_ADJACENT_REDUCTION_COMPOSITION"
-        },
-        "maximum_intermediate_magnitude_upper_hex": "0x1.7328cc0000000p+32",
-        "series": {
-          "absolute_rounding_error_upper_hex": "0x1.f8076ca610744p-33",
-          "domain": "finite IEEE f64 inputs with |x| <= 12",
-          "status": "PROVED_UNDER_DECLARED_PRIMITIVE_SEMANTICS"
-        }
-      }
-    }
+    "transition_band_authority": "evidence/adjacent-reduction-bands.json",
+    "transition_band_authority_sha256": "038676e5847ec006ff524b470774f480dfdb6b5c8e79e7a0e143bbce79d04420"
   },
+  "closed_obligations": [
+    {
+      "id": "FP-ADJACENT-REDUCTION-COMPOSITION",
+      "statement": "Every exact-rational floating transition band, both adjacent selected quadrants, the shadow radius, and the Taylor/phase/Hankel composition are certified.",
+      "status": "PROVED"
+    }
+  ],
   "declared_primitive_semantics": {
     "add_subtract_multiply_divide": "one IEEE-754 roundTiesToEven operation in the named precision, gradual underflow, no contraction",
     "evaluation_order": "strict written source tree; no reassociation or common-subexpression rewrite",
@@ -81,8 +34,8 @@
   "maximum_intermediate_magnitude_upper_hex": "0x1.7328cc0000000p+32",
   "open_obligations": [
     {
-      "id": "FP-ADJACENT-REDUCTION-COMPOSITION",
-      "statement": "Exact index equality is falsified. Prove one absolute error theorem that composes every adjacent floating reduction selection with its quadrant map, reduced-argument rounding, and both Taylor graphs.",
+      "id": "FP-ROOT-SOLVER-ARITHMETIC",
+      "statement": "Bind the bracketed root solver's source arithmetic and stopping logic to certified root ULP/residual envelopes.",
       "status": "OPEN"
     },
     {
@@ -108,84 +61,186 @@
   "range_reduction_index_analysis": {
     "f32": {
       "j0": {
-        "adjacent_only_proof": "The exact-rational product error is less than one, so roundTiesToEven integer results can differ by at most one.",
-        "disagreeing_edge_count": 361,
-        "edge_check_count": 1296,
+        "accepted_product_error_upper_hex": "0x1.463306a30c131p-14",
+        "adjacent_only_proof": "accepted eta is less than 1/4; outside the disjoint bands m=n, and inside B_k both indices lie in {k,k+1}.",
+        "candidate_count": 10089,
+        "composition_status": "ADJACENT_REDUCTION_COMPOSITION_PROVED",
         "first_witness": {
           "exact_real_index": 3,
           "floating_index": 4,
-          "position": "PREDECESSOR",
           "x_bits": "0x40c90fdb",
           "x_hex": "0x1.921fb60000000p+2"
         },
         "index_difference_abs_upper": 1,
-        "method": "exact-rational check of the predecessor and first successor at every exact-real integer-transition preimage",
-        "reduction_product_error_upper_hex": "0x1.463306a30c131p-14",
+        "method": "complete exact-rational disjoint transition-band partition; all in-band IEEE candidates and complete mismatch bit spans",
+        "mismatch_count": 362,
+        "mismatch_span_count": 361,
+        "shadow_reduction_radius_upper_hex": "0x1.923525f4bed49p-1",
+        "stable_interior_count": 649,
+        "stable_interior_proof": "Every point outside the closed transition bands lies in one common roundTiesToEven integer cell for z and zhat.",
         "status": "EXACT_INDEX_EQUALITY_FALSIFIED",
-        "transition_count": 648
+        "transition_band_authority_sha256": "038676e5847ec006ff524b470774f480dfdb6b5c8e79e7a0e143bbce79d04420",
+        "transition_band_count": 648
       },
       "j1": {
-        "adjacent_only_proof": "The exact-rational product error is less than one, so roundTiesToEven integer results can differ by at most one.",
-        "disagreeing_edge_count": 358,
-        "edge_check_count": 1296,
+        "accepted_product_error_upper_hex": "0x1.46b306a2dfb66p-14",
+        "adjacent_only_proof": "accepted eta is less than 1/4; outside the disjoint bands m=n, and inside B_k both indices lie in {k,k+1}.",
+        "candidate_count": 10100,
+        "composition_status": "ADJACENT_REDUCTION_COMPOSITION_PROVED",
         "first_witness": {
           "exact_real_index": 3,
           "floating_index": 2,
-          "position": "FIRST_SUCCESSOR",
           "x_bits": "0x40c90fdb",
           "x_hex": "0x1.921fb60000000p+2"
         },
         "index_difference_abs_upper": 1,
-        "method": "exact-rational check of the predecessor and first successor at every exact-real integer-transition preimage",
-        "reduction_product_error_upper_hex": "0x1.46b306a2dfb66p-14",
+        "method": "complete exact-rational disjoint transition-band partition; all in-band IEEE candidates and complete mismatch bit spans",
+        "mismatch_count": 364,
+        "mismatch_span_count": 358,
+        "shadow_reduction_radius_upper_hex": "0x1.92352c3d3dabbp-1",
+        "stable_interior_count": 649,
+        "stable_interior_proof": "Every point outside the closed transition bands lies in one common roundTiesToEven integer cell for z and zhat.",
         "status": "EXACT_INDEX_EQUALITY_FALSIFIED",
-        "transition_count": 648
+        "transition_band_authority_sha256": "038676e5847ec006ff524b470774f480dfdb6b5c8e79e7a0e143bbce79d04420",
+        "transition_band_count": 648
       }
     },
     "f64": {
       "j0": {
-        "adjacent_only_proof": "The exact-rational product error is less than one, so roundTiesToEven integer results can differ by at most one.",
-        "disagreeing_edge_count": 348,
-        "edge_check_count": 1288,
+        "accepted_product_error_upper_hex": "0x1.463306dc9c884p-43",
+        "adjacent_only_proof": "accepted eta is less than 1/4; outside the disjoint bands m=n, and inside B_k both indices lie in {k,k+1}.",
+        "candidate_count": 8549,
+        "composition_status": "ADJACENT_REDUCTION_COMPOSITION_PROVED",
         "first_witness": {
           "exact_real_index": 7,
           "floating_index": 8,
-          "position": "PREDECESSOR",
           "x_bits": "0x402921fb54442d17",
           "x_hex": "0x1.921fb54442d17p+3"
         },
         "index_difference_abs_upper": 1,
-        "method": "exact-rational check of the predecessor and first successor at every exact-real integer-transition preimage",
-        "reduction_product_error_upper_hex": "0x1.463306dc9c884p-43",
+        "method": "complete exact-rational disjoint transition-band partition; all in-band IEEE candidates and complete mismatch bit spans",
+        "mismatch_count": 363,
+        "mismatch_span_count": 348,
+        "shadow_reduction_radius_upper_hex": "0x1.921fb54443755p-1",
+        "stable_interior_count": 645,
+        "stable_interior_proof": "Every point outside the closed transition bands lies in one common roundTiesToEven integer cell for z and zhat.",
         "status": "EXACT_INDEX_EQUALITY_FALSIFIED",
-        "transition_count": 644
+        "transition_band_authority_sha256": "038676e5847ec006ff524b470774f480dfdb6b5c8e79e7a0e143bbce79d04420",
+        "transition_band_count": 644
       },
       "j1": {
-        "adjacent_only_proof": "The exact-rational product error is less than one, so roundTiesToEven integer results can differ by at most one.",
-        "disagreeing_edge_count": 355,
-        "edge_check_count": 1288,
+        "accepted_product_error_upper_hex": "0x1.46b306dc9c884p-43",
+        "adjacent_only_proof": "accepted eta is less than 1/4; outside the disjoint bands m=n, and inside B_k both indices lie in {k,k+1}.",
+        "candidate_count": 8563,
+        "composition_status": "ADJACENT_REDUCTION_COMPOSITION_PROVED",
         "first_witness": {
           "exact_real_index": 7,
           "floating_index": 8,
-          "position": "PREDECESSOR",
           "x_bits": "0x402c463abeccb2ba",
           "x_hex": "0x1.c463abeccb2bap+3"
         },
         "index_difference_abs_upper": 1,
-        "method": "exact-rational check of the predecessor and first successor at every exact-real integer-transition preimage",
-        "reduction_product_error_upper_hex": "0x1.46b306dc9c884p-43",
+        "method": "complete exact-rational disjoint transition-band partition; all in-band IEEE candidates and complete mismatch bit spans",
+        "mismatch_count": 364,
+        "mismatch_span_count": 355,
+        "shadow_reduction_radius_upper_hex": "0x1.921fb54443758p-1",
+        "stable_interior_count": 645,
+        "stable_interior_proof": "Every point outside the closed transition bands lies in one common roundTiesToEven integer cell for z and zhat.",
         "status": "EXACT_INDEX_EQUALITY_FALSIFIED",
-        "transition_count": 644
+        "transition_band_authority_sha256": "038676e5847ec006ff524b470774f480dfdb6b5c8e79e7a0e143bbce79d04420",
+        "transition_band_count": 644
       }
     }
   },
   "release_conformance": false,
-  "release_implication": "BLOCKED; conditional source bounds are neither backend bounds nor release envelopes",
-  "schema_version": "futhark-bessel.floating-point-analysis.v1",
+  "release_implication": "BLOCKED; source-graph evaluation proofs are not backend-lowering proofs or release envelopes, and root arithmetic remains open",
+  "schema_version": "futhark-bessel.floating-point-analysis.v2",
   "scope": {
-    "composition_with_exact_real_bound": "NOT_PERFORMED_WHILE_FLOATING_POINT_OBLIGATIONS_ARE_OPEN",
-    "covered": "written Futhark J0/J1 source-operation order, including gradual-underflow absolute error terms and finite-intermediate bounds",
-    "excluded": "backend lowering equivalence, contraction/reassociation, adjacent reduction-cell composition, root solver arithmetic, and runtime conformance"
+    "composition_with_exact_real_bound": "PROVED_VIA_SHADOW_INDEX_ADJACENT_QUADRANT_COMPOSITION",
+    "covered": "written Futhark J0/J1 source-operation order, including gradual-underflow absolute error terms, finite intermediates, the complete adjacent reduction partition, all quadrant maps, and composition with mathematical approximation bounds",
+    "excluded": "backend lowering equivalence, contraction/reassociation, root solver arithmetic, and runtime conformance"
   },
-  "status": "PARTIAL_CONDITIONAL_SOURCE_GRAPH_ANALYSIS"
+  "source_graph_results": {
+    "f32": {
+      "j0": {
+        "asymptotic": {
+          "absolute_rounding_error_upper_hex": "0x1.86822aa6b2de9p-9",
+          "absolute_source_error_upper_hex": "0x1.86c48dd435f1ap-9",
+          "adjacent_quadrant_certificate_rows": 8,
+          "domain": "finite IEEE f32 inputs with 6 < |x| <= 1024",
+          "shadow_math_approximation_error_upper_hex": "0x1.098cb60c4c200p-19",
+          "shadow_reduction_radius_upper_hex": "0x1.923525f4bed49p-1",
+          "status": "PROVED_UNDER_DECLARED_PRIMITIVE_SEMANTICS"
+        },
+        "maximum_intermediate_magnitude_upper_hex": "0x1.baf8000000000p+21",
+        "series": {
+          "absolute_rounding_error_upper_hex": "0x1.e0b23c234ebc8p-13",
+          "absolute_source_error_upper_hex": "0x1.e0b23c234ebc8p-13",
+          "domain": "finite IEEE f32 inputs with |x| <= 6",
+          "mathematical_approximation_error_upper_hex": "0x1.259c5eae630dfp-262",
+          "status": "PROVED_UNDER_DECLARED_PRIMITIVE_SEMANTICS"
+        }
+      },
+      "j1": {
+        "asymptotic": {
+          "absolute_rounding_error_upper_hex": "0x1.9701e757a769bp-9",
+          "absolute_source_error_upper_hex": "0x1.974c80f60d16fp-9",
+          "adjacent_quadrant_certificate_rows": 8,
+          "domain": "finite IEEE f32 inputs with 6 < |x| <= 1024",
+          "shadow_math_approximation_error_upper_hex": "0x1.2a667996b50efp-19",
+          "shadow_reduction_radius_upper_hex": "0x1.92352c3d3dabbp-1",
+          "status": "PROVED_UNDER_DECLARED_PRIMITIVE_SEMANTICS"
+        },
+        "maximum_intermediate_magnitude_upper_hex": "0x1.baf8000000000p+21",
+        "series": {
+          "absolute_rounding_error_upper_hex": "0x1.b3a5f7ecde66dp-13",
+          "absolute_source_error_upper_hex": "0x1.b3a5f7ecde66dp-13",
+          "domain": "finite IEEE f32 inputs with |x| <= 6",
+          "mathematical_approximation_error_upper_hex": "0x1.19ddcb88b1033p-266",
+          "status": "PROVED_UNDER_DECLARED_PRIMITIVE_SEMANTICS"
+        }
+      }
+    },
+    "f64": {
+      "j0": {
+        "asymptotic": {
+          "absolute_rounding_error_upper_hex": "0x1.56d12851bcd44p-25",
+          "absolute_source_error_upper_hex": "0x1.5756aae4480cap-25",
+          "adjacent_quadrant_certificate_rows": 8,
+          "domain": "finite IEEE f64 inputs with 12 < |x| <= 1024",
+          "shadow_math_approximation_error_upper_hex": "0x1.0b05251670c30p-34",
+          "shadow_reduction_radius_upper_hex": "0x1.921fb54443755p-1",
+          "status": "PROVED_UNDER_DECLARED_PRIMITIVE_SEMANTICS"
+        },
+        "maximum_intermediate_magnitude_upper_hex": "0x1.7328cc0000000p+32",
+        "series": {
+          "absolute_rounding_error_upper_hex": "0x1.083b684bad197p-32",
+          "absolute_source_error_upper_hex": "0x1.083b684bad197p-32",
+          "domain": "finite IEEE f64 inputs with |x| <= 12",
+          "mathematical_approximation_error_upper_hex": "0x1.a831ecb7538c4p-509",
+          "status": "PROVED_UNDER_DECLARED_PRIMITIVE_SEMANTICS"
+        }
+      },
+      "j1": {
+        "asymptotic": {
+          "absolute_rounding_error_upper_hex": "0x1.5dff973f60f81p-25",
+          "absolute_source_error_upper_hex": "0x1.5e8f7d045f872p-25",
+          "adjacent_quadrant_certificate_rows": 8,
+          "domain": "finite IEEE f64 inputs with 12 < |x| <= 1024",
+          "shadow_math_approximation_error_upper_hex": "0x1.1fcb89fd1e0afp-34",
+          "shadow_reduction_radius_upper_hex": "0x1.921fb54443758p-1",
+          "status": "PROVED_UNDER_DECLARED_PRIMITIVE_SEMANTICS"
+        },
+        "maximum_intermediate_magnitude_upper_hex": "0x1.7328cc0000000p+32",
+        "series": {
+          "absolute_rounding_error_upper_hex": "0x1.f8076ca610744p-33",
+          "absolute_source_error_upper_hex": "0x1.f8076ca610744p-33",
+          "domain": "finite IEEE f64 inputs with |x| <= 12",
+          "mathematical_approximation_error_upper_hex": "0x1.9f89b8dd61843p-513",
+          "status": "PROVED_UNDER_DECLARED_PRIMITIVE_SEMANTICS"
+        }
+      }
+    }
+  },
+  "status": "SOURCE_EVALUATION_PROVED_BACKEND_LOWERING_OPEN"
 }

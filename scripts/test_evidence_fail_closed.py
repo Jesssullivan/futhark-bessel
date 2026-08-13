@@ -5,11 +5,13 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import tempfile
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Iterator
 
+import adjacent_composition_proof as adjacent
 import check_observed_envelopes as envelopes
 import floating_point_analysis as floating
 
@@ -76,6 +78,7 @@ def test_envelope_limits() -> None:
 def test_exact_real_binding() -> None:
     original_path = floating.EXACT_REAL
     original = json.loads(original_path.read_text())
+    implementation_sha = hashlib.sha256(floating.IMPLEMENTATION.read_bytes()).hexdigest()
     mutations = (
         ({"status": "CERTIFIED_EXACT_REAL_WHOLE_DOMAIN"}, "schema"),
         (
@@ -142,10 +145,134 @@ def test_exact_real_binding() -> None:
         ),
     )
     for document, fragment in mutations:
+        expect_blocked(
+            lambda value=document: floating.validate_exact_real(
+                value, implementation_sha
+            ),
+            fragment,
+        )
+
+
+def test_adjacent_authority_binding() -> None:
+    original_path = floating.ADJACENT_PROOF
+    original = json.loads(original_path.read_text())
+    implementation_sha = hashlib.sha256(floating.IMPLEMENTATION.read_bytes()).hexdigest()
+    mutations = (
+        (
+            {**original, "status": "ADJACENT_REDUCTION_COMPOSITION_OPEN"},
+            "not proved",
+        ),
+        (
+            {
+                **original,
+                "authority": {
+                    **original["authority"],
+                    "transition_bands_sha256": "0" * 64,
+                },
+            },
+            "transition_bands hash drifted",
+        ),
+        (
+            {
+                **original,
+                "release_implications": {
+                    **original["release_implications"],
+                    "backend_lowering_equivalence": "PROVED",
+                },
+            },
+            "release implications drifted",
+        ),
+        (
+            {
+                **original,
+                "transition_census": {
+                    **original["transition_census"],
+                    "f32": {
+                        **original["transition_census"]["f32"],
+                        "j0": {
+                            **original["transition_census"]["f32"]["j0"],
+                            "transition_band_count": 647,
+                        },
+                    },
+                },
+            },
+            "census drifted",
+        ),
+    )
+    for document, fragment in mutations:
         with patched_json(original_path, document) as mutated:
-            floating.EXACT_REAL = mutated
-            expect_blocked(floating.generate, fragment)
-    floating.EXACT_REAL = original_path
+            floating.ADJACENT_PROOF = mutated
+            expect_blocked(
+                lambda: floating.load_adjacent_proof(implementation_sha), fragment
+            )
+    floating.ADJACENT_PROOF = original_path
+
+
+def test_transition_band_integrity() -> None:
+    original = json.loads(adjacent.BANDS.read_text())
+    original_case = original["cases"][0]
+    mutations = (
+        ("allowed", "IEEE band enclosure drifted"),
+        ("span", "mismatch span drifted"),
+        ("radius", "shadow radius drifted"),
+        ("edge", "domain edge separation drifted"),
+    )
+    for mutation, fragment in mutations:
+        case = json.loads(json.dumps(original_case))
+        if mutation == "allowed":
+            case["partition"]["bands"][0]["allowed_indices"] = [
+                case["partition"]["bands"][0]["k"]
+            ]
+        elif mutation == "span":
+            band = next(
+                item
+                for item in case["partition"]["bands"]
+                if item["mismatch_spans"]
+            )
+            band["mismatch_spans"][0]["exact_index"] += 100
+        elif mutation == "radius":
+            case["parameters"]["shadow_reduction_radius"] = {
+                "numerator": "0",
+                "denominator": "1",
+            }
+        else:
+            case["partition"]["domain_edge_separation"]["preceding_band_k"] += 1
+        expect_blocked(
+            lambda value=case: adjacent.verify_band_case(value, "f32", 0),
+            fragment,
+        )
+
+
+def test_adjacent_certificate_integrity() -> None:
+    adjacent.mp.mp.dps = 180
+    rows = [
+        json.loads(line)
+        for line in adjacent.CERTIFICATES.read_text().splitlines()
+    ]
+
+    def render(items: list[dict[str, Any]]) -> bytes:
+        return ("\n".join(json.dumps(item) for item in items) + "\n").encode()
+
+    selected = json.loads(json.dumps(rows))
+    quadrant = next(item for item in selected if item["kind"] == "adjacent_quadrant")
+    quadrant["selected_quadrant"] = (quadrant["selected_quadrant"] + 1) % 4
+    expect_blocked(
+        lambda: adjacent.verify_certificates(render(selected)),
+        "selected quadrant drifted",
+    )
+
+    escaped = json.loads(json.dumps(rows))
+    quadrant = next(item for item in escaped if item["kind"] == "adjacent_quadrant")
+    quadrant["shadow_math_absolute_error"] = "0"
+    expect_blocked(
+        lambda: adjacent.verify_certificates(render(escaped)),
+        "escaped Arb certificate",
+    )
+
+    expect_blocked(
+        lambda: adjacent.verify_certificates(render(rows[:-1])),
+        "expected 36",
+    )
 
 
 def test_parity_shape() -> None:
@@ -162,6 +289,9 @@ def test_parity_shape() -> None:
 def main() -> None:
     test_envelope_limits()
     test_exact_real_binding()
+    test_adjacent_authority_binding()
+    test_transition_band_integrity()
+    test_adjacent_certificate_integrity()
     test_parity_shape()
     print("OK floating-point evidence mutations fail closed")
 

@@ -40,12 +40,24 @@ that theorem.
 
 `just floating-point-analysis` separately checks exact-rational forward-error
 bounds for the written source-operation graph under explicitly declared
-round-to-nearest-even primitive semantics. The series bounds cover their source
-branches. Exact index preservation is machine-falsified at representable inputs;
-the asymptotic bounds therefore remain conditional on a proof that composes the
-two adjacent reduction cells. No source bound applies to a backend until that
-backend's lowering, contraction, and reassociation behavior is bound to an
-analyzed graph. The counterexamples and open obligations are machine-readable in
+round-to-nearest-even primitive semantics. Exact index preservation is
+machine-falsified at representable inputs. `just adjacent-composition-proof`
+therefore regenerates FLINT/Arb certificates and independently verifies the
+complete disjoint transition-band partition, either selected adjacent quadrant,
+the shadow-index radius, and Taylor/phase/Hankel composition with mpmath. The
+2,584 floating transition bands in
+`evidence/adjacent-reduction-bands.json` are deliberately distinct from the
+2,584 canonical exact-real cell boundaries in the approximation ledger. They
+contain 37,301 representable candidates and a complete census of 1,453
+index-mismatching inputs in 1,422 bit spans. The f32 shadow radius exceeds the
+older canonical `pi/4 + 0.0001` diagnostic radius, so its certificate uses the
+direct Taylor Lagrange remainder at the larger shadow radius.
+
+The resulting source-operation bounds now cover both branches and compose with
+their mathematical approximation bounds. No source bound applies to a backend
+until that backend's lowering, contraction, and reassociation behavior is bound
+to an analyzed graph. Root-solver arithmetic is also still open. Evidence and
+open obligations are machine-readable in
 `evidence/floating-point-analysis.json`; release remains blocked.
 
 `just observed-envelopes` checks C/WASM results on the certified finite sample
