@@ -20,7 +20,15 @@ adjacent = json.loads(
 observed_envelopes = json.loads(
     Path("evidence/observed-regression-envelopes.json").read_text()
 )
-root_envelope = json.loads(Path("evidence/f32-root-envelope.json").read_text())
+root_envelopes = {
+    precision: json.loads(
+        Path(f"evidence/{precision}-root-envelope.json").read_text()
+    )
+    for precision in ("f32", "f64")
+}
+root_correction = json.loads(
+    Path("evidence/f64-root-cache-correction.json").read_text()
+)
 
 if observations.get("status") != "OBSERVED_BASELINE_NOT_RELEASE_CONFORMANCE":
     raise SystemExit("BLOCKED: backend evidence must remain explicitly non-ratifying")
@@ -122,37 +130,135 @@ if observed_envelopes.get("status") != (
     raise SystemExit("BLOCKED: observed envelopes must remain sample-only")
 if observed_envelopes.get("release_conformance") is not False:
     raise SystemExit("BLOCKED: observed envelopes cannot confer conformance")
-if root_envelope.get("status") != "SOURCE_CACHE_ROOT_ENVELOPE_CERTIFIED":
-    raise SystemExit("BLOCKED: f32 cached-root envelope certificate is missing")
-if root_envelope.get("release_conformance") is not False:
-    raise SystemExit("BLOCKED: source root evidence cannot confer backend conformance")
-if root_envelope.get("envelopes", {}).get("root_ulp_error_upper") != 0:
-    raise SystemExit("BLOCKED: f32 cached roots are not certified correctly rounded")
-if root_envelope.get("envelopes", {}).get("true_residual_abs_upper_hex") != (
-    "0x1.0000000000000p-19"
+f64_observed_root_ceiling = observed_envelopes.get("declared_envelopes", {}).get(
+    "f64", {}
+).get("roots", {})
+if (
+    f64_observed_root_ceiling.get("max_ulp_error") != 0
+    or f64_observed_root_ceiling.get("max_absolute_error_hex") != "0x0p+0"
+    or f64_observed_root_ceiling.get("max_independent_residual_hex") != "0x1p-48"
 ):
-    raise SystemExit("BLOCKED: f32 true-residual envelope drifted")
-if root_envelope.get("release_implications") != {
+    raise SystemExit("BLOCKED: f64 cache regression ceiling must require exact roots")
+expected_root_implications = {
     "backend_lowering_equivalence": "OPEN",
     "f32_cached_root_ulp_and_mathematical_residual": "CERTIFIED",
     "f32_reported_residual": "BACKEND_CONFORMANCE_OPEN",
-    "f64_root_envelope": "OPEN",
+    "f64_cached_root_ulp_and_mathematical_residual": "CERTIFIED",
+    "f64_reported_residual": "BACKEND_CONFORMANCE_OPEN",
     "overall_release_status": "INCOMPLETE",
     "root_solver_arithmetic": "OPEN",
+}
+expected_root_residuals = {
+    "f32": "0x1.0000000000000p-19",
+    "f64": "0x1.0000000000000p-48",
+}
+for precision, root_envelope in root_envelopes.items():
+    if root_envelope.get("status") != "SOURCE_CACHE_ROOT_ENVELOPE_CERTIFIED":
+        raise SystemExit(
+            f"BLOCKED: {precision} cached-root envelope certificate is missing"
+        )
+    if root_envelope.get("release_conformance") is not False:
+        raise SystemExit("BLOCKED: source root evidence cannot confer backend conformance")
+    if root_envelope.get("envelopes", {}).get("root_ulp_error_upper") != 0:
+        raise SystemExit(
+            f"BLOCKED: {precision} cached roots are not certified correctly rounded"
+        )
+    if root_envelope.get("envelopes", {}).get(
+        "true_residual_abs_upper_hex"
+    ) != expected_root_residuals[precision]:
+        raise SystemExit(f"BLOCKED: {precision} true-residual envelope drifted")
+    if root_envelope.get("release_implications") != expected_root_implications:
+        raise SystemExit(
+            f"BLOCKED: {precision} root-envelope release boundary drifted"
+        )
+if root_correction.get("status") != "SOURCE_CACHE_GENERATOR_CORRECTED":
+    raise SystemExit("BLOCKED: f64 root-cache correction witness is missing")
+if root_correction.get("release_conformance") is not False:
+    raise SystemExit("BLOCKED: cache correction cannot confer backend conformance")
+if root_correction.get("pre_fix", {}).get("first_witness") != {
+    "cached_bits": "0x400ea75575af6f08",
+    "certified_bits": "0x400ea75575af6f09",
+    "index": 1,
+    "ulp_error": 1,
 }:
-    raise SystemExit("BLOCKED: f32 root-envelope release boundary drifted")
+    raise SystemExit("BLOCKED: pre-fix f64 root-1 witness drifted")
+if root_correction.get("pre_fix", {}).get("f64_mismatched_root_count") != 111:
+    raise SystemExit("BLOCKED: pre-fix f64 cache mismatch census drifted")
+if root_correction.get("pre_fix", {}).get("f64_maximum_ulp_error") != 1:
+    raise SystemExit("BLOCKED: pre-fix f64 maximum ULP witness drifted")
+if root_correction.get("pre_fix", {}).get("f32_mismatched_root_count") != 0:
+    raise SystemExit("BLOCKED: pre-fix f32 cache mismatch census drifted")
+root_mismatch_indices = root_correction.get("pre_fix", {}).get(
+    "f64_mismatched_root_indices", []
+)
+if (
+    len(root_mismatch_indices) != 111
+    or root_mismatch_indices != sorted(set(root_mismatch_indices))
+    or any(
+        not isinstance(index, int) or index < 1 or index > 256
+        for index in root_mismatch_indices
+    )
+):
+    raise SystemExit("BLOCKED: pre-fix f64 mismatch index census drifted")
+historical_corrections = root_correction.get("pre_fix", {}).get(
+    "f64_corrections", []
+)
+if (
+    not isinstance(historical_corrections, list)
+    or len(historical_corrections) != 111
+    or [item.get("index") for item in historical_corrections]
+    != root_mismatch_indices
+    or any(
+        set(item) != {"cached_bits", "certified_bits", "index", "ulp_error"}
+        or item.get("ulp_error") != 1
+        or not isinstance(item.get("cached_bits"), str)
+        or not isinstance(item.get("certified_bits"), str)
+        or abs(
+            int(item["cached_bits"], 16) - int(item["certified_bits"], 16)
+        ) != 1
+        for item in historical_corrections
+    )
+):
+    raise SystemExit("BLOCKED: historical f64 1-ULP corrections drifted")
+correction_authority = root_correction.get("authority", {})
+if correction_authority.get("certificate_relationship") != (
+    "the reference oracle's uniquely rounded bits feed the renderer; "
+    "the separate envelope oracle recomputes roots and residuals "
+    "without consuming the cache; mpmath independently replays both"
+):
+    raise SystemExit("BLOCKED: f64 cache authority relationship drifted")
+if root_correction.get("correction", {}).get("f32_changed_root_count") != 0:
+    raise SystemExit("BLOCKED: f32 cached roots changed during f64 correction")
+if root_correction.get("correction", {}).get("f64_changed_root_count") != 111:
+    raise SystemExit("BLOCKED: f64 corrected-root census drifted")
+if root_correction.get("correction", {}).get(
+    "f64_every_change_exactly_one_ulp"
+) is not True:
+    raise SystemExit("BLOCKED: f64 cache correction is not entirely 1 ULP")
+if root_correction.get("correction", {}).get(
+    "f32_remaining_ulp_mismatches"
+) != 0 or root_correction.get("correction", {}).get(
+    "f64_remaining_ulp_mismatches"
+) != 0:
+    raise SystemExit("BLOCKED: corrected cache still has root ULP mismatches")
 root_budget = error_budget.get("root_evidence", {})
-if root_budget.get("f32_release_ulp_envelope", {}).get("maximum_ulp_error") != 0:
-    raise SystemExit("BLOCKED: f32 root ULP error budget drifted")
-if root_budget.get("f32_release_residual_envelope", {}).get(
-    "maximum_true_residual_abs_hex"
-) != "0x1.0000000000000p-19":
-    raise SystemExit("BLOCKED: f32 root residual error budget drifted")
+for precision in ("f32", "f64"):
+    if root_budget.get(f"{precision}_release_ulp_envelope", {}).get(
+        "maximum_ulp_error"
+    ) != 0:
+        raise SystemExit(f"BLOCKED: {precision} root ULP error budget drifted")
+    if root_budget.get(f"{precision}_release_residual_envelope", {}).get(
+        "maximum_true_residual_abs_hex"
+    ) != expected_root_residuals[precision]:
+        raise SystemExit(
+            f"BLOCKED: {precision} root residual error budget drifted"
+        )
 
 required_closed_fragments = (
     "Independent FLINT/Arb certificates",
     "Mathematical series, Hankel, phase-reduction",
     "All 256 public cached f32 roots",
+    "All 256 public cached f64 roots",
 )
 for fragment in required_closed_fragments:
     matching = [line for line in release_lines if fragment in line]

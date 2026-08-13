@@ -115,13 +115,13 @@
     "f64": {
       "c": {
         "roots": {
-          "max_absolute_error_against_rounded_reference_hex": "0x1.0000000000000p-43",
-          "max_independent_residual_decimal": "3.60376459054360562796053220742e-15",
+          "max_absolute_error_against_rounded_reference_hex": "0x0.0p+0",
+          "max_independent_residual_decimal": "1.79427778354582661335554897709e-15",
           "max_reported_residual_hex": "0x1.215bd919d0a2ep-37",
-          "max_ulp_error": 1,
+          "max_ulp_error": 0,
           "sample_count": 256,
-          "worst_absolute_error_index": 164,
-          "worst_independent_residual_index": 195,
+          "worst_absolute_error_index": 1,
+          "worst_independent_residual_index": 168,
           "worst_reported_residual_index": 4,
           "worst_ulp_error_index": 1
         },
@@ -163,13 +163,13 @@
       },
       "wasm": {
         "roots": {
-          "max_absolute_error_against_rounded_reference_hex": "0x1.0000000000000p-43",
-          "max_independent_residual_decimal": "3.60376459054360562796053220742e-15",
+          "max_absolute_error_against_rounded_reference_hex": "0x0.0p+0",
+          "max_independent_residual_decimal": "1.79427778354582661335554897709e-15",
           "max_reported_residual_hex": "0x1.215bd919d0a2ep-37",
-          "max_ulp_error": 1,
+          "max_ulp_error": 0,
           "sample_count": 256,
-          "worst_absolute_error_index": 164,
-          "worst_independent_residual_index": 195,
+          "worst_absolute_error_index": 1,
+          "worst_independent_residual_index": 168,
           "worst_reported_residual_index": 4,
           "worst_ulp_error_index": 1
         },

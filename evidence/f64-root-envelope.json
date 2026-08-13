@@ -23,20 +23,20 @@
     "root_reference_oracle_sha256": "09dac50267e13497eb14391db3f9581f7d856b1237073a2a631756c2289dff97"
   },
   "envelopes": {
-    "certified_maximum_true_residual_upper_hex": "0x1.16c24b25ef3f5p-20",
-    "certified_maximum_true_residual_upper_index": 172,
+    "certified_maximum_true_residual_upper_hex": "0x1.02952a882dcd9p-49",
+    "certified_maximum_true_residual_upper_index": 168,
     "index_domain": {
       "maximum": 256,
       "minimum": 1
     },
-    "precision": "f32",
+    "precision": "f64",
     "root_ulp_error_upper": 0,
-    "true_residual_abs_upper_hex": "0x1.0000000000000p-19"
+    "true_residual_abs_upper_hex": "0x1.0000000000000p-48"
   },
   "independent_replay": {
     "all_correctly_rounded": true,
-    "maximum_true_residual_decimal": "1.038458046206294024639857595898372199805e-6",
-    "maximum_true_residual_index": 172,
+    "maximum_true_residual_decimal": "1.794277783545826613355548977088493049128e-15",
+    "maximum_true_residual_index": 168,
     "root_count": 256
   },
   "release_conformance": false,
@@ -49,9 +49,9 @@
     "overall_release_status": "INCOMPLETE",
     "root_solver_arithmetic": "OPEN"
   },
-  "schema_version": "futhark-bessel.f32-root-envelope.v1",
+  "schema_version": "futhark-bessel.f64-root-envelope.v1",
   "scope": {
-    "covered": "all 256 binary32 root literals returned by the public cached positive_j1_root path; ULP distance is measured against the correctly rounded mathematical J1 root and residual means the independent mathematical value |J1(r_hat)|; Arb-certified reference bits generate the disposable, non-authoritative cache, while a separate Arb computation and mpmath replay verify it",
+    "covered": "all 256 binary64 root literals returned by the public cached positive_j1_root path; ULP distance is measured against the correctly rounded mathematical J1 root and residual means the independent mathematical value |J1(r_hat)|; Arb-certified reference bits generate the disposable, non-authoritative cache, while a separate Arb computation and mpmath replay verify it",
     "excluded": "positive_j1_root_solved arithmetic and stopping logic, the implementation-reported approximate residual, and C/WASM/WebGPU lowering or runtime conformance"
   },
   "status": "SOURCE_CACHE_ROOT_ENVELOPE_CERTIFIED"

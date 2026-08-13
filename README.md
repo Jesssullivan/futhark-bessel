@@ -67,12 +67,16 @@ tripwires. They are neither inferred whole-domain bounds nor release
 conformance envelopes, and WebGPU remains unexecuted.
 
 `just root-envelope-proof` independently recomputes all 256 mathematical `J1`
-roots with FLINT/Arb, proves their unique binary32 rounding, bounds the true
-residual at each exact rounded value, and replays the result with mpmath. The
-public cached f32 roots therefore have zero ULP error and
-`|J1(r_hat)| <= 0x1p-19`. This source-artifact certificate does not cover the
-recomputing solver, its implementation-reported residual, or any backend
-lowering; those remain separate release gates.
+roots with FLINT/Arb, proves their unique binary32 and binary64 rounding, bounds
+the true residual at each exact rounded value, and replays the result with
+mpmath. The public cached roots therefore have zero ULP error and
+`|J1(r_hat)| <= 0x1p-19` for f32 and `|J1(r_hat)| <= 0x1p-48` for f64. These
+source-artifact certificates do not cover the recomputing solver, its
+implementation-reported residual, or any backend lowering; those remain
+separate release gates. The cache is a non-authoritative derived artifact: the
+Arb-certified reference bits generate it, while a separate Arb computation and
+mpmath replay verify every emitted f32/f64 literal. The machine-readable
+historical correction witness is `evidence/f64-root-cache-correction.json`.
 
 Development is tracked under Wavegen TIN-3715. Licensed under the
 [ISC License](LICENSE).

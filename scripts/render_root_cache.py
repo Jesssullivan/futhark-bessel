@@ -5,6 +5,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
+import re
 import struct
 from pathlib import Path
 
@@ -24,16 +26,29 @@ def from_f32_bits(bits: int) -> float:
     return struct.unpack(">f", struct.pack(">I", bits))[0]
 
 
-def outward_f32(lo: float, hi: float) -> tuple[float, float, float]:
-    midpoint = lo + (hi - lo) / 2.0
-    root = as_f32(midpoint)
+def from_f64_bits(bits: int) -> float:
+    return struct.unpack(">d", struct.pack(">Q", bits))[0]
+
+
+def reference_bits(row: dict[str, object], precision: str) -> int:
+    width = 32 if precision == "f32" else 64
+    field = f"root_{precision}_reference_bits"
+    text = row.get(field)
+    if not isinstance(text, str) or not re.fullmatch(
+        rf"0x[0-9a-f]{{{width // 4}}}", text
+    ):
+        raise SystemExit(f"malformed {precision} root reference bits")
+    return int(text, 16)
+
+
+def outward_f32(lo: float, hi: float) -> tuple[float, float]:
     lo32 = as_f32(lo)
     hi32 = as_f32(hi)
     if lo32 > lo:
         lo32 = from_f32_bits(f32_bits(lo32) - 1)
     if hi32 < hi:
         hi32 = from_f32_bits(f32_bits(hi32) + 1)
-    return lo32, hi32, root
+    return lo32, hi32
 
 
 def array(name: str, scalar: str, values: list[str]) -> str:
@@ -52,21 +67,60 @@ def render() -> str:
     roots.sort(key=lambda row: row["index"])
     if [row["index"] for row in roots] != list(range(1, 257)):
         raise SystemExit("root evidence must contain exactly indices 1..256")
+    required = {
+        "kind",
+        "index",
+        "lo_hex",
+        "hi_hex",
+        "j1_lo",
+        "j1_hi",
+        "root_f64_reference_bits",
+        "root_f32_reference_bits",
+        "bisections",
+        "certified_sign_change",
+        "certified_unique_rounding",
+    }
+    for row in roots:
+        if set(row) != required:
+            raise SystemExit(f"root evidence fields drifted at index {row['index']}")
+        if row["bisections"] != 160:
+            raise SystemExit(f"root bisection count drifted at index {row['index']}")
+        if row["certified_sign_change"] is not True:
+            raise SystemExit(f"missing root sign-change proof at index {row['index']}")
+        if row["certified_unique_rounding"] is not True:
+            raise SystemExit(f"missing root rounding proof at index {row['index']}")
 
     lo64 = [row["lo_hex"] for row in roots]
     hi64 = [row["hi_hex"] for row in roots]
-    root64 = [
-        (float.fromhex(row["lo_hex"]) +
-         (float.fromhex(row["hi_hex"]) - float.fromhex(row["lo_hex"])) / 2.0).hex()
-        for row in roots
+    root64_values = [
+        from_f64_bits(reference_bits(row, "f64")) for row in roots
     ]
-    triples32 = [
+    root32_values = [
+        from_f32_bits(reference_bits(row, "f32")) for row in roots
+    ]
+    pairs32 = [
         outward_f32(float.fromhex(row["lo_hex"]), float.fromhex(row["hi_hex"]))
         for row in roots
     ]
-    lo32 = [value[0].hex() + "f32" for value in triples32]
-    hi32 = [value[1].hex() + "f32" for value in triples32]
-    root32 = [value[2].hex() + "f32" for value in triples32]
+    for index, (row, root64, root32, pair32) in enumerate(
+        zip(roots, root64_values, root32_values, pairs32, strict=True), start=1
+    ):
+        lo = float.fromhex(row["lo_hex"])
+        hi = float.fromhex(row["hi_hex"])
+        if not all(math.isfinite(value) for value in (lo, hi, root64, root32)):
+            raise SystemExit(f"nonfinite root evidence at index {index}")
+        lo_bits = struct.unpack(">Q", struct.pack(">d", lo))[0]
+        hi_bits = struct.unpack(">Q", struct.pack(">d", hi))[0]
+        if hi_bits != lo_bits + 1:
+            raise SystemExit(f"non-adjacent f64 root bracket at index {index}")
+        if not lo <= root64 <= hi:
+            raise SystemExit(f"certified f64 root escaped bracket at index {index}")
+        if not pair32[0] <= root32 <= pair32[1]:
+            raise SystemExit(f"certified f32 root escaped bracket at index {index}")
+    root64 = [value.hex() for value in root64_values]
+    lo32 = [value[0].hex() + "f32" for value in pairs32]
+    hi32 = [value[1].hex() + "f32" for value in pairs32]
+    root32 = [value.hex() + "f32" for value in root32_values]
 
     sections = [
         "-- SPDX-License-Identifier: ISC",

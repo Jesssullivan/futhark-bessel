@@ -1,0 +1,838 @@
+{
+  "authority": {
+    "certificate_relationship": "the reference oracle's uniquely rounded bits feed the renderer; the separate envelope oracle recomputes roots and residuals without consuming the cache; mpmath independently replays both",
+    "implementation": "lib/github.com/Jesssullivan/futhark-bessel/bessel_internal.fut",
+    "implementation_sha256": "2b459fb3e24e82a825db5f44cc8b3ebe9c8387d598235f84c4e80996b4e7d9d1",
+    "reference_certificates": "evidence/arb-certificates.jsonl",
+    "reference_certificates_sha256": "392d10fa295a3ab03c2a0bd4a52c426593a6705d2e843177215064601f62ea0a",
+    "reference_oracle": "oracle/arb_oracle.c",
+    "reference_oracle_sha256": "09dac50267e13497eb14391db3f9581f7d856b1237073a2a631756c2289dff97",
+    "separate_envelope_certificates": "evidence/root-envelope-certificates.jsonl",
+    "separate_envelope_certificates_sha256": "e4739642e3e88faa6ace72432bfc7c240adfa6974b7766960fd6bc8de4d80edc",
+    "separate_envelope_oracle": "oracle/root_envelopes.c",
+    "separate_envelope_oracle_sha256": "4404158ed8bbd96c024de45da8dc04ddf5d7171d3383d2159fb4b6f5f6fe9df4",
+    "verifier": "scripts/root_envelope_proof.py",
+    "verifier_sha256": "e5b34448fb39f460734b76c74ee6b8b5eae6633e6940dd773c29968fa4dc3a76"
+  },
+  "correction": {
+    "f32_changed_root_count": 0,
+    "f32_remaining_ulp_mismatches": 0,
+    "f64_changed_root_count": 111,
+    "f64_every_change_exactly_one_ulp": true,
+    "f64_remaining_ulp_mismatches": 0,
+    "method": "render the independently Arb-certified reference bits rather than selecting an endpoint through a floating midpoint",
+    "renderer": "scripts/render_root_cache.py",
+    "renderer_mutation_checks": "scripts/test_render_root_cache_fail_closed.py",
+    "renderer_mutation_checks_sha256": "70a645551ed28e119f27374f356ad6aeafe0281cf4ea148bd5463e3118a733df",
+    "renderer_sha256": "f0163fb9d39025d53fec60ae98b2f52d7e7cc70190ca2a8f310f72a10dd16e17",
+    "root_cache": "lib/github.com/Jesssullivan/futhark-bessel/root_cache.fut",
+    "root_cache_sha256": "a9c4aa56f0e757a4df8cff4d4a4f7290a7a481c81c14e0f3cc464dfb24bab086"
+  },
+  "pre_fix": {
+    "commit": "715f165eb715b9512d867c30ed0da7c6d4ef6765",
+    "defect": "the renderer evaluated the midpoint expression for adjacent f64 endpoints in binary64; adding the representable half-ULP to an endpoint is a halfway rounding tie, so it selected an endpoint by ties-to-even instead of by the mathematical root's position relative to the real midpoint",
+    "f32_mismatched_root_count": 0,
+    "f64_corrections": [
+      {
+        "cached_bits": "0x400ea75575af6f08",
+        "certified_bits": "0x400ea75575af6f09",
+        "index": 1,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x402458d0d0bdfc2a",
+        "certified_bits": "0x402458d0d0bdfc29",
+        "index": 3,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x4030787b360508c4",
+        "certified_bits": "0x4030787b360508c5",
+        "index": 5,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x40433cc523d5cb6a",
+        "certified_bits": "0x40433cc523d5cb69",
+        "index": 12,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x404661315d6b1340",
+        "certified_bits": "0x404661315d6b133f",
+        "index": 14,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x404ca9ec5a82324c",
+        "certified_bits": "0x404ca9ec5a82324b",
+        "index": 18,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x40588af0db557e52",
+        "certified_bits": "0x40588af0db557e51",
+        "index": 31,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x405ae625e6837c1a",
+        "certified_bits": "0x405ae625e6837c19",
+        "index": 34,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x405baf375fd41b82",
+        "certified_bits": "0x405baf375fd41b81",
+        "index": 35,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x405e0a6b49adcf94",
+        "certified_bits": "0x405e0a6b49adcf95",
+        "index": 38,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x405ed37c71c9d268",
+        "certified_bits": "0x405ed37c71c9d267",
+        "index": 39,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x40609757c5b387da",
+        "certified_bits": "0x40609757c5b387db",
+        "index": 42,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x4060fbe03c0272a8",
+        "certified_bits": "0x4060fbe03c0272a7",
+        "index": 43,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x40616068ac204d7e",
+        "certified_bits": "0x40616068ac204d7f",
+        "index": 44,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x406229797b641466",
+        "certified_bits": "0x406229797b641467",
+        "index": 46,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x4062f28a3660232e",
+        "certified_bits": "0x4062f28a3660232d",
+        "index": 48,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x4063bb9adf806044",
+        "certified_bits": "0x4063bb9adf806045",
+        "index": 50,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x406420232e0552bc",
+        "certified_bits": "0x406420232e0552bd",
+        "index": 51,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x40654dbc0413eed6",
+        "certified_bits": "0x40654dbc0413eed5",
+        "index": 54,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x406616cc82c6bd98",
+        "certified_bits": "0x406616cc82c6bd97",
+        "index": 56,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x40667b54bdd3b24e",
+        "certified_bits": "0x40667b54bdd3b24f",
+        "index": 57,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x406744652c0e70d6",
+        "certified_bits": "0x406744652c0e70d7",
+        "index": 59,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x406871fdbf9e37a8",
+        "certified_bits": "0x406871fdbf9e37a7",
+        "index": 62,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x40693b0e176dd2ae",
+        "certified_bits": "0x40693b0e176dd2af",
+        "index": 64,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x406c5f4f315ee062",
+        "certified_bits": "0x406c5f4f315ee061",
+        "index": 72,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x406cc3d74dfcd430",
+        "certified_bits": "0x406cc3d74dfcd42f",
+        "index": 73,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x406d8ce783733e84",
+        "certified_bits": "0x406d8ce783733e85",
+        "index": 75,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x406df16f9c65080c",
+        "certified_bits": "0x406df16f9c65080b",
+        "index": 76,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x406eba7fcaf0388e",
+        "certified_bits": "0x406eba7fcaf0388f",
+        "index": 78,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x406f838ff54cb4ea",
+        "certified_bits": "0x406f838ff54cb4e9",
+        "index": 80,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x4070589416d455bc",
+        "certified_bits": "0x4070589416d455bb",
+        "index": 83,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x40708ad81f554964",
+        "certified_bits": "0x40708ad81f554965",
+        "index": 84,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x4070bd1c276b0fd2",
+        "certified_bits": "0x4070bd1c276b0fd1",
+        "index": 85,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x4070ef602f196358",
+        "certified_bits": "0x4070ef602f196357",
+        "index": 86,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x407153e83d4dc2be",
+        "certified_bits": "0x407153e83d4dc2bf",
+        "index": 88,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x4071b8704a0cfaba",
+        "certified_bits": "0x4071b8704a0cfab9",
+        "index": 90,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x407281805f8af99e",
+        "certified_bits": "0x407281805f8af99d",
+        "index": 94,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x4072b3c46424bbbe",
+        "certified_bits": "0x4072b3c46424bbbf",
+        "index": 95,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x4072e6086874537e",
+        "certified_bits": "0x4072e6086874537d",
+        "index": 96,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x4073184c6c7c0a8c",
+        "certified_bits": "0x4073184c6c7c0a8b",
+        "index": 97,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x4073af1876f96dfe",
+        "certified_bits": "0x4073af1876f96dfd",
+        "index": 100,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x407413a07cb642fc",
+        "certified_bits": "0x407413a07cb642fb",
+        "index": 102,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x4074aa6c83940430",
+        "certified_bits": "0x4074aa6c83940431",
+        "index": 105,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x4074dcb0856dd852",
+        "certified_bits": "0x4074dcb0856dd851",
+        "index": 106,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x4075737c89c09b98",
+        "certified_bits": "0x4075737c89c09b97",
+        "index": 109,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x40763c8c8cd9cffc",
+        "certified_bits": "0x40763c8c8cd9cffb",
+        "index": 113,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x4076a1148d58c3be",
+        "certified_bits": "0x4076a1148d58c3bf",
+        "index": 115,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x4076d3588d58e330",
+        "certified_bits": "0x4076d3588d58e32f",
+        "index": 116,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x4077059c8d303730",
+        "certified_bits": "0x4077059c8d303731",
+        "index": 117,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x407737e08cdfc8b6",
+        "certified_bits": "0x407737e08cdfc8b7",
+        "index": 118,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x40776a248c6897d0",
+        "certified_bits": "0x40776a248c6897d1",
+        "index": 119,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x40779c688bcb9c0a",
+        "certified_bits": "0x40779c688bcb9c0b",
+        "index": 120,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x4078657887f00022",
+        "certified_bits": "0x4078657887f00023",
+        "index": 124,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x4078ca0085365b3e",
+        "certified_bits": "0x4078ca0085365b3f",
+        "index": 126,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x4078fc4483a960b6",
+        "certified_bits": "0x4078fc4483a960b5",
+        "index": 127,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x40792e8881fd4bc6",
+        "certified_bits": "0x40792e8881fd4bc7",
+        "index": 128,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x407960cc8032d544",
+        "certified_bits": "0x407960cc8032d543",
+        "index": 129,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x407993107e4ab04e",
+        "certified_bits": "0x407993107e4ab04f",
+        "index": 130,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x4079c5547c458a96",
+        "certified_bits": "0x4079c5547c458a97",
+        "index": 131,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x407a29dc77e6d980",
+        "certified_bits": "0x407a29dc77e6d981",
+        "index": 133,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x407af2ec6de91872",
+        "certified_bits": "0x407af2ec6de91873",
+        "index": 137,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x407b577468533c60",
+        "certified_bits": "0x407b577468533c61",
+        "index": 139,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x407bbbfc625e6c06",
+        "certified_bits": "0x407bbbfc625e6c05",
+        "index": 141,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x407c850c55679ef4",
+        "certified_bits": "0x407c850c55679ef5",
+        "index": 145,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x407cb75051f486e8",
+        "certified_bits": "0x407cb75051f486e7",
+        "index": 146,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x407d1bd84ad14abc",
+        "certified_bits": "0x407d1bd84ad14abd",
+        "index": 148,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x407de4e83ba1dc4e",
+        "certified_bits": "0x407de4e83ba1dc4d",
+        "index": 152,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x407e172c37a7af9a",
+        "certified_bits": "0x407e172c37a7af9b",
+        "index": 153,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x407e4970339bb48e",
+        "certified_bits": "0x407e4970339bb48f",
+        "index": 154,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x407e7bb42f7e4340",
+        "certified_bits": "0x407e7bb42f7e433f",
+        "index": 155,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x407f770819f08fc0",
+        "certified_bits": "0x407f770819f08fbf",
+        "index": 160,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x4080200c03cc0ec4",
+        "certified_bits": "0x4080200c03cc0ec5",
+        "index": 164,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x4080b6d7f5333610",
+        "certified_bits": "0x4080b6d7f5333611",
+        "index": 170,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x4080e91bf02060ae",
+        "certified_bits": "0x4080e91bf02060ad",
+        "index": 172,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x4081023ded8d8038",
+        "certified_bits": "0x4081023ded8d8037",
+        "index": 173,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x40813481e8555df2",
+        "certified_bits": "0x40813481e8555df3",
+        "index": 175,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x40814da3e5b0518a",
+        "certified_bits": "0x40814da3e5b05189",
+        "index": 176,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x408166c5e3056ade",
+        "certified_bits": "0x408166c5e3056add",
+        "index": 177,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x40822fd5cce6e3b4",
+        "certified_bits": "0x40822fd5cce6e3b5",
+        "index": 185,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x408248f7ca0b7f0c",
+        "certified_bits": "0x408248f7ca0b7f0b",
+        "index": 186,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x40826219c72b24bc",
+        "certified_bits": "0x40826219c72b24bb",
+        "index": 187,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x4082ad7fbe6d1c18",
+        "certified_bits": "0x4082ad7fbe6d1c17",
+        "index": 190,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x4082c6a1bb79b14a",
+        "certified_bits": "0x4082c6a1bb79b149",
+        "index": 191,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x4082dfc3b881b1d4",
+        "certified_bits": "0x4082dfc3b881b1d5",
+        "index": 192,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x40832b29af7eebbe",
+        "certified_bits": "0x40832b29af7eebbf",
+        "index": 195,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x40835d6da9676f0a",
+        "certified_bits": "0x40835d6da9676f09",
+        "index": 197,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x4084267d90675868",
+        "certified_bits": "0x4084267d90675869",
+        "index": 205,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x40843f9f8d361100",
+        "certified_bits": "0x40843f9f8d361101",
+        "index": 206,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x408471e386c89acc",
+        "certified_bits": "0x408471e386c89acd",
+        "index": 208,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x40848b05838c86b0",
+        "certified_bits": "0x40848b05838c86af",
+        "index": 209,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x4084d66b79c38116",
+        "certified_bits": "0x4084d66b79c38117",
+        "index": 212,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x4084ef8d7679bb10",
+        "certified_bits": "0x4084ef8d7679bb0f",
+        "index": 213,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x408521d16fdc5130",
+        "certified_bits": "0x408521d16fdc512f",
+        "index": 215,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x4085541569320d10",
+        "certified_bits": "0x4085541569320d0f",
+        "index": 217,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x40856d3765d8356c",
+        "certified_bits": "0x40856d3765d8356b",
+        "index": 218,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x40858659627b48ba",
+        "certified_bits": "0x40858659627b48b9",
+        "index": 219,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x40859f7b5f1b51b8",
+        "certified_bits": "0x40859f7b5f1b51b9",
+        "index": 220,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x4085b89d5bb85af8",
+        "certified_bits": "0x4085b89d5bb85af7",
+        "index": 221,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x40861d254e0f4ee8",
+        "certified_bits": "0x40861d254e0f4ee9",
+        "index": 225,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x40864f694729cf2c",
+        "certified_bits": "0x40864f694729cf2d",
+        "index": 227,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x40869acf3cbd2bc6",
+        "certified_bits": "0x40869acf3cbd2bc7",
+        "index": 230,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x4086b3f1393e5426",
+        "certified_bits": "0x4086b3f1393e5425",
+        "index": 231,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x4086cd1335bce532",
+        "certified_bits": "0x4086cd1335bce531",
+        "index": 232,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x4086e6353238e774",
+        "certified_bits": "0x4086e6353238e773",
+        "index": 233,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x408718792b296100",
+        "certified_bits": "0x408718792b2960ff",
+        "index": 235,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x4087af4515c0b62e",
+        "certified_bits": "0x4087af4515c0b62f",
+        "index": 241,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x4087c86712271c32",
+        "certified_bits": "0x4087c86712271c33",
+        "index": 242,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x40885f32fc5f1f4e",
+        "certified_bits": "0x40885f32fc5f1f4f",
+        "index": 248,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x40887854f8b64f2c",
+        "certified_bits": "0x40887854f8b64f2d",
+        "index": 249,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x40890f20e296d3c2",
+        "certified_bits": "0x40890f20e296d3c3",
+        "index": 255,
+        "ulp_error": 1
+      },
+      {
+        "cached_bits": "0x40892842dee008d6",
+        "certified_bits": "0x40892842dee008d7",
+        "index": 256,
+        "ulp_error": 1
+      }
+    ],
+    "f64_maximum_ulp_error": 1,
+    "f64_mismatched_root_count": 111,
+    "f64_mismatched_root_indices": [
+      1,
+      3,
+      5,
+      12,
+      14,
+      18,
+      31,
+      34,
+      35,
+      38,
+      39,
+      42,
+      43,
+      44,
+      46,
+      48,
+      50,
+      51,
+      54,
+      56,
+      57,
+      59,
+      62,
+      64,
+      72,
+      73,
+      75,
+      76,
+      78,
+      80,
+      83,
+      84,
+      85,
+      86,
+      88,
+      90,
+      94,
+      95,
+      96,
+      97,
+      100,
+      102,
+      105,
+      106,
+      109,
+      113,
+      115,
+      116,
+      117,
+      118,
+      119,
+      120,
+      124,
+      126,
+      127,
+      128,
+      129,
+      130,
+      131,
+      133,
+      137,
+      139,
+      141,
+      145,
+      146,
+      148,
+      152,
+      153,
+      154,
+      155,
+      160,
+      164,
+      170,
+      172,
+      173,
+      175,
+      176,
+      177,
+      185,
+      186,
+      187,
+      190,
+      191,
+      192,
+      195,
+      197,
+      205,
+      206,
+      208,
+      209,
+      212,
+      213,
+      215,
+      217,
+      218,
+      219,
+      220,
+      221,
+      225,
+      227,
+      230,
+      231,
+      232,
+      233,
+      235,
+      241,
+      242,
+      248,
+      249,
+      255,
+      256
+    ],
+    "first_witness": {
+      "cached_bits": "0x400ea75575af6f08",
+      "certified_bits": "0x400ea75575af6f09",
+      "index": 1,
+      "ulp_error": 1
+    },
+    "implementation": "lib/github.com/Jesssullivan/futhark-bessel/bessel_internal.fut",
+    "implementation_sha256": "2b459fb3e24e82a825db5f44cc8b3ebe9c8387d598235f84c4e80996b4e7d9d1",
+    "renderer": "scripts/render_root_cache.py",
+    "renderer_sha256": "705aea38d8e4f44bc035e9604e2f2126487302994a598561eddb75446fed7710",
+    "root_cache": "lib/github.com/Jesssullivan/futhark-bessel/root_cache.fut",
+    "root_cache_sha256": "ba31e5cb5d34ca65ba6a2ff0b6d194b2bd1cfe8a286ebb70479766ae16c04642"
+  },
+  "release_conformance": false,
+  "schema_version": "futhark-bessel.f64-root-cache-correction.v1",
+  "scope": {
+    "covered": "the historical f64 endpoint-selection defect, its root-1 witness and complete 256-root mismatch census, corrected cache binding, confirmation that all f32 root literals are unchanged, and the independently certified source-cache true-residual envelope |J1(r_hat)| <= 0x1p-48",
+    "excluded": "positive_j1_root_solved arithmetic and stopping logic, the implementation-reported approximate residual, and C/WASM/WebGPU lowering or runtime conformance"
+  },
+  "status": "SOURCE_CACHE_GENERATOR_CORRECTED"
+}

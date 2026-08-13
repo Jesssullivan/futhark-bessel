@@ -38,9 +38,12 @@ oracle:
 root-cache: oracle
   python3 scripts/render_root_cache.py
 
-evidence: oracle
-  python3 scripts/check_evidence.py evidence/arb-certificates.jsonl
+root-cache-check: oracle
   python3 scripts/render_root_cache.py --check
+  PYTHONPATH=scripts python3 scripts/test_render_root_cache_fail_closed.py
+
+evidence: root-cache-check
+  python3 scripts/check_evidence.py evidence/arb-certificates.jsonl
 
 _approximation-ledger:
   mkdir -p build evidence
@@ -74,12 +77,13 @@ _root-envelope-ledger:
   cc -std=c11 -O2 -Wall -Wextra -Werror oracle/root_envelopes.c -lflint -lmpfr -lm -o build/root_envelopes
   build/root_envelopes > evidence/root-envelope-certificates.jsonl
 
-root-envelope-proof: _root-envelope-ledger
+root-envelope-proof: evidence _root-envelope-ledger
   python3 scripts/root_envelope_proof.py --check
   PYTHONPATH=scripts python3 scripts/test_root_envelope_fail_closed.py
 
-root-envelope-proof-write: _root-envelope-ledger
+root-envelope-proof-write: root-cache _root-envelope-ledger
   python3 scripts/root_envelope_proof.py --write
+  PYTHONPATH=scripts python3 scripts/test_root_envelope_fail_closed.py
 
 backend-conformance: evidence
   python3 scripts/backend_conformance.py --check

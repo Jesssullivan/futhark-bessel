@@ -36,6 +36,13 @@ have machine-readable evidence at the tagged commit.
       `|J1(r_hat)| <= 0x1p-19`. Evidence is in
       `evidence/f32-root-envelope.json`. This does not certify the recomputing
       solver, its reported approximate residual, or backend lowering.
+- [x] All 256 public cached f64 roots are independently certified as correctly
+      rounded (zero ULP error), with the true mathematical residual envelope
+      `|J1(r_hat)| <= 0x1p-48`. Evidence is in
+      `evidence/f64-root-envelope.json`. This does not certify the recomputing
+      solver, its reported approximate residual, or backend lowering. The
+      historical endpoint-selection correction is recorded in
+      `evidence/f64-root-cache-correction.json`.
 - [x] Checked evaluation distinguishes `OK`, `OUT_OF_DOMAIN`, and `NONFINITE`;
       parity, signed zero, endpoints, and nonfinite behavior are tested.
 - [ ] Every approximation constant is hexadecimal, reproducible from a pinned
