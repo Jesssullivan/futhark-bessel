@@ -4,8 +4,8 @@
 
 from __future__ import annotations
 
-import hashlib
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -423,90 +423,6 @@ def test_evidence_write_and_stale_paths() -> None:
         sys.argv = original_argv
 
 
-def run_preflight(directory: Path) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(
-        [sys.executable, str(ROOT / "scripts/release_preflight.py")],
-        cwd=directory,
-        check=False,
-        capture_output=True,
-        text=True,
-    )
-
-
-def require_preflight_reason(directory: Path, fragment: str) -> None:
-    completed = run_preflight(directory)
-    output = completed.stdout + completed.stderr
-    if completed.returncode != 1 or fragment not in output:
-        raise SystemExit(
-            f"wrong release-preflight result: expected {fragment!r}, got "
-            f"exit {completed.returncode}: {output!r}"
-        )
-
-
-def test_release_preflight_root_boundaries() -> None:
-    with tempfile.TemporaryDirectory() as directory:
-        fixture = Path(directory)
-        shutil.copy(ROOT / "RELEASE.md", fixture / "RELEASE.md")
-        shutil.copytree(ROOT / "evidence", fixture / "evidence")
-        implementation = fixture / "lib/github.com/Jesssullivan/futhark-bessel"
-        implementation.mkdir(parents=True)
-        shutil.copy(
-            proof.IMPLEMENTATION,
-            implementation / proof.IMPLEMENTATION.name,
-        )
-        scripts = fixture / "scripts"
-        scripts.mkdir()
-        for source in (
-            "scripts/root_solver_proof.py",
-            "scripts/solver_root_manifest.py",
-            "scripts/solver_root_envelope_proof.py",
-        ):
-            shutil.copy(ROOT / source, scripts)
-        oracle = fixture / "oracle"
-        oracle.mkdir()
-        for source in (
-            "oracle/arb_oracle.c",
-            "oracle/solver_root_envelopes.c",
-        ):
-            shutil.copy(ROOT / source, oracle)
-
-        require_preflight_reason(fixture, "5 release gates remain unchecked")
-
-        solver_path = fixture / "evidence/root-solver-arithmetic.json"
-        solver = json.loads(solver_path.read_text())
-        solver["release_implications"][
-            "solver_mathematical_root_ulp_and_true_residual"
-        ] = "PROVED"
-        solver_path.write_text(json.dumps(solver))
-        require_preflight_reason(fixture, "root-solver release boundary drifted")
-        shutil.copy(ROOT / "evidence/root-solver-arithmetic.json", solver_path)
-
-        budget_path = fixture / "evidence/error-budget.json"
-        budget = json.loads(budget_path.read_text())
-        budget["root_evidence"]["root_solver_source_graph"]["status"] = "OPEN"
-        budget_path.write_text(json.dumps(budget))
-        require_preflight_reason(fixture, "root-solver error-budget entry drifted")
-        shutil.copy(ROOT / "evidence/error-budget.json", budget_path)
-
-        floating_path = fixture / "evidence/floating-point-analysis.json"
-        floating = json.loads(floating_path.read_text())
-        floating["open_obligations"][0]["id"] = "FP-ROOT-SOLVER-ARITHMETIC"
-        floating_path.write_text(json.dumps(floating))
-        require_preflight_reason(fixture, "floating-point obligation set drifted")
-
-        shutil.copy(ROOT / "evidence/floating-point-analysis.json", floating_path)
-        envelope_path = fixture / "evidence/solver-root-envelopes.json"
-        envelope = json.loads(envelope_path.read_text())
-        envelope["envelopes"]["f64"]["root_ulp_error_upper"] = 21202
-        envelope_path.write_text(json.dumps(envelope))
-        floating = json.loads(floating_path.read_text())
-        floating["authority"]["solver_root_envelopes_sha256"] = hashlib.sha256(
-            envelope_path.read_bytes()
-        ).hexdigest()
-        floating_path.write_text(json.dumps(floating))
-        require_preflight_reason(fixture, "f64 solver-root envelope drifted")
-
-
 def run_source_bundle(directory: Path) -> str:
     completed = subprocess.run(
         [sys.executable, "scripts/coefficient_hash.py"],
@@ -554,6 +470,72 @@ def test_source_bundle_membership_and_sensitivity() -> None:
                 )
 
 
+def test_no_downstream_ledger_dependency() -> None:
+    """Keep the source-arithmetic gate runnable before ignored ledgers exist."""
+
+    child_marker = "FUTHARK_BESSEL_ABSENT_SOLVER_ENVELOPE_LEDGERS"
+    forbidden = (
+        "evidence/" + "solver-root-outputs.jsonl",
+        "evidence/" + "solver-root-envelope-certificates.jsonl",
+        "scripts/" + "release_preflight.py",
+    )
+    for path in (Path(__file__), proof.ANALYZER):
+        source = path.read_text()
+        for dependency in forbidden:
+            if dependency in source:
+                raise SystemExit(
+                    "root-solver source gate acquired downstream dependency "
+                    f"{dependency} in {path}"
+                )
+
+    if os.environ.get(child_marker) == "1":
+        for relative in forbidden[:2]:
+            if Path(relative).exists():
+                raise SystemExit(
+                    f"clean-checkout fixture unexpectedly contains {relative}"
+                )
+        return
+
+    tracked = subprocess.run(
+        ["git", "ls-files", "-z"],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+    ).stdout.split(b"\0")
+    with tempfile.TemporaryDirectory() as directory:
+        fixture = Path(directory)
+        for encoded in tracked:
+            if not encoded:
+                continue
+            relative = Path(encoded.decode())
+            source = ROOT / relative
+            if not source.is_file():
+                continue
+            destination = fixture / relative
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, destination)
+        for relative in forbidden[:2]:
+            if (fixture / relative).exists():
+                raise SystemExit(
+                    f"tracked clean-checkout fixture contains ignored {relative}"
+                )
+        environment = os.environ.copy()
+        environment[child_marker] = "1"
+        completed = subprocess.run(
+            [sys.executable, "scripts/test_root_solver_fail_closed.py"],
+            cwd=fixture,
+            env=environment,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        if completed.returncode != 0:
+            raise SystemExit(
+                "root-solver mutation suite failed without downstream ledgers: "
+                f"{completed.stdout}{completed.stderr}"
+            )
+
+
 def main() -> None:
     test_source_mutations()
     test_round_ties_to_even()
@@ -562,8 +544,8 @@ def main() -> None:
     test_direct_source_expression_parity()
     test_terminal_operation_forms_are_distinct()
     test_evidence_write_and_stale_paths()
-    test_release_preflight_root_boundaries()
     test_source_bundle_membership_and_sensitivity()
+    test_no_downstream_ledger_dependency()
     print(
         "OK root-solver proof fails closed on sign/bracket/iteration/residual/"
         "source-hash drift; IEEE primitives and direct source-expression "

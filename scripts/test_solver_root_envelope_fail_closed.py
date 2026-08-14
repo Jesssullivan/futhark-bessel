@@ -4,7 +4,11 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
+import shutil
+import subprocess
+import sys
 import tempfile
 from pathlib import Path
 from typing import Any, Callable
@@ -13,6 +17,8 @@ import mpmath as mp
 
 import solver_root_envelope_proof as proof
 import solver_root_manifest as manifest_generator
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
 def expect_blocked(function: Callable[[], Any], fragment: str) -> None:
@@ -60,6 +66,98 @@ def structural_mutations(
     reordered = json.loads(json.dumps(rows))
     reordered[0], reordered[1] = reordered[1], reordered[0]
     expect_blocked(lambda: loader(encoded(reordered)), order_fragment)
+
+
+def run_preflight(directory: Path) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        [sys.executable, str(ROOT / "scripts/release_preflight.py")],
+        cwd=directory,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+
+def require_preflight_reason(directory: Path, fragment: str) -> None:
+    completed = run_preflight(directory)
+    output = completed.stdout + completed.stderr
+    if completed.returncode != 1 or fragment not in output:
+        raise SystemExit(
+            f"wrong release-preflight result: expected {fragment!r}, got "
+            f"exit {completed.returncode}: {output!r}"
+        )
+
+
+def test_release_preflight_root_boundaries() -> None:
+    """Exercise the full boundary only after ignored ledgers are generated."""
+
+    for required in (proof.MANIFEST, proof.CERTIFICATES):
+        if not required.is_file():
+            raise SystemExit(
+                f"solver-root preflight test requires generated ledger {required}"
+            )
+
+    with tempfile.TemporaryDirectory() as directory:
+        fixture = Path(directory)
+        shutil.copy(ROOT / "RELEASE.md", fixture / "RELEASE.md")
+        shutil.copytree(ROOT / "evidence", fixture / "evidence")
+        implementation = fixture / "lib/github.com/Jesssullivan/futhark-bessel"
+        implementation.mkdir(parents=True)
+        shutil.copy(
+            proof.IMPLEMENTATION,
+            implementation / proof.IMPLEMENTATION.name,
+        )
+        scripts = fixture / "scripts"
+        scripts.mkdir()
+        for source in (
+            "scripts/root_solver_proof.py",
+            "scripts/solver_root_manifest.py",
+            "scripts/solver_root_envelope_proof.py",
+        ):
+            shutil.copy(ROOT / source, scripts)
+        oracle = fixture / "oracle"
+        oracle.mkdir()
+        for source in (
+            "oracle/arb_oracle.c",
+            "oracle/solver_root_envelopes.c",
+        ):
+            shutil.copy(ROOT / source, oracle)
+
+        require_preflight_reason(fixture, "5 release gates remain unchecked")
+
+        solver_path = fixture / "evidence/root-solver-arithmetic.json"
+        solver = json.loads(solver_path.read_text())
+        solver["release_implications"][
+            "solver_mathematical_root_ulp_and_true_residual"
+        ] = "PROVED"
+        solver_path.write_text(json.dumps(solver))
+        require_preflight_reason(fixture, "root-solver release boundary drifted")
+        shutil.copy(ROOT / "evidence/root-solver-arithmetic.json", solver_path)
+
+        budget_path = fixture / "evidence/error-budget.json"
+        budget = json.loads(budget_path.read_text())
+        budget["root_evidence"]["root_solver_source_graph"]["status"] = "OPEN"
+        budget_path.write_text(json.dumps(budget))
+        require_preflight_reason(fixture, "root-solver error-budget entry drifted")
+        shutil.copy(ROOT / "evidence/error-budget.json", budget_path)
+
+        floating_path = fixture / "evidence/floating-point-analysis.json"
+        floating = json.loads(floating_path.read_text())
+        floating["open_obligations"][0]["id"] = "FP-ROOT-SOLVER-ARITHMETIC"
+        floating_path.write_text(json.dumps(floating))
+        require_preflight_reason(fixture, "floating-point obligation set drifted")
+
+        shutil.copy(ROOT / "evidence/floating-point-analysis.json", floating_path)
+        envelope_path = fixture / "evidence/solver-root-envelopes.json"
+        envelope = json.loads(envelope_path.read_text())
+        envelope["envelopes"]["f64"]["root_ulp_error_upper"] = 21202
+        envelope_path.write_text(json.dumps(envelope))
+        floating = json.loads(floating_path.read_text())
+        floating["authority"]["solver_root_envelopes_sha256"] = hashlib.sha256(
+            envelope_path.read_bytes()
+        ).hexdigest()
+        floating_path.write_text(json.dumps(floating))
+        require_preflight_reason(fixture, "f64 solver-root envelope drifted")
 
 
 def main() -> None:
@@ -191,6 +289,8 @@ def main() -> None:
             )
         finally:
             proof.ORACLE = original_oracle
+
+    test_release_preflight_root_boundaries()
 
     print(
         "OK solver-root manifest/certificate/hash/bit/residual/cache "
