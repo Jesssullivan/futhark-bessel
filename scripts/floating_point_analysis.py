@@ -414,7 +414,7 @@ def load_adjacent_proof(implementation_sha: str) -> dict[str, Any]:
         "adjacent_source_reduction_composition": "PROVED",
         "backend_lowering_equivalence": "OPEN",
         "overall_release_status": "INCOMPLETE",
-        "root_solver_arithmetic": "OPEN",
+        "solver_mathematical_root_ulp_and_true_residual": "OPEN",
     }:
         raise SystemExit("adjacent proof release implications drifted")
     authority = proof.get("authority", {})
@@ -667,7 +667,8 @@ def generate() -> dict[str, Any]:
             ),
             "excluded": (
                 "backend lowering equivalence, contraction/reassociation, root "
-                "solver arithmetic, and runtime conformance"
+                "solver mathematical-root ULP/true-residual envelopes, and "
+                "runtime conformance"
             ),
             "composition_with_exact_real_bound": (
                 "PROVED_VIA_SHADOW_INDEX_ADJACENT_QUADRANT_COMPOSITION"
@@ -731,11 +732,12 @@ def generate() -> dict[str, Any]:
         ],
         "open_obligations": [
             {
-                "id": "FP-ROOT-SOLVER-ARITHMETIC",
+                "id": "FP-ROOT-SOLVER-MATHEMATICAL-ROOT-ENVELOPES",
                 "status": "OPEN",
                 "statement": (
-                    "Bind the bracketed root solver's source arithmetic and "
-                    "stopping logic to certified root ULP/residual envelopes."
+                    "Bind the separately proved bracketed root-solver source "
+                    "graph to solver-output mathematical-root ULP and true-"
+                    "residual envelopes."
                 ),
             },
             {
@@ -765,7 +767,8 @@ def generate() -> dict[str, Any]:
         ],
         "release_implication": (
             "BLOCKED; source-graph evaluation proofs are not backend-lowering "
-            "proofs or release envelopes, and root arithmetic remains open"
+            "proofs or release envelopes, and solver mathematical-root "
+            "envelopes remain open"
         ),
     }
 
@@ -788,7 +791,7 @@ def main() -> None:
         )
     print(
         "OK source evaluation and adjacent composition bounds; release remains "
-        "BLOCKED on backend lowering and root arithmetic"
+        "BLOCKED on backend lowering and solver mathematical-root envelopes"
     )
 
 

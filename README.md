@@ -56,9 +56,18 @@ direct Taylor Lagrange remainder at the larger shadow radius.
 The resulting source-operation bounds now cover both branches and compose with
 their mathematical approximation bounds. No source bound applies to a backend
 until that backend's lowering, contraction, and reassociation behavior is bound
-to an analyzed graph. Root-solver arithmetic is also still open. Evidence and
-open obligations are machine-readable in
-`evidence/floating-point-analysis.json`; release remains blocked.
+to an analyzed graph. `just root-solver-proof` separately replays the written
+`positive_j1_root_solved` source graph with exact rationals and explicit IEEE
+round-to-nearest-even primitives. For every index `1..256`, separately in f32
+and f64, it proves source-evaluation bracketing, bisection progress and stopping,
+returned-record construction, and that the reported residual is bit-exact
+`abs(j1_finite(root))` under that same graph. The compact all-step transcript
+digests are in `evidence/root-solver-arithmetic.json`.
+
+That root-solver theorem is not a mathematical-root accuracy envelope. It does
+not prove solver-root ULP error or a true `J1` residual, and it does not bind C,
+WASM, or WebGPU lowering, contraction, reassociation, or runtime behavior.
+Those obligations remain open and release remains blocked.
 
 `just observed-envelopes` checks C/WASM results on the certified finite sample
 ledger against separately declared dyadic regression ceilings in
@@ -71,12 +80,13 @@ roots with FLINT/Arb, proves their unique binary32 and binary64 rounding, bounds
 the true residual at each exact rounded value, and replays the result with
 mpmath. The public cached roots therefore have zero ULP error and
 `|J1(r_hat)| <= 0x1p-19` for f32 and `|J1(r_hat)| <= 0x1p-48` for f64. These
-source-artifact certificates do not cover the recomputing solver, its
-implementation-reported residual, or any backend lowering; those remain
-separate release gates. The cache is a non-authoritative derived artifact: the
-Arb-certified reference bits generate it, while a separate Arb computation and
-mpmath replay verify every emitted f32/f64 literal. The machine-readable
-historical correction witness is `evidence/f64-root-cache-correction.json`.
+source-artifact certificates remain distinct from the recomputing solver's
+source-graph proof: they do not provide that solver's mathematical-root/true-
+residual envelope or certify a backend-reported residual. The cache is a
+non-authoritative derived artifact: the Arb-certified reference bits generate
+it, while a separate Arb computation and mpmath replay verify every emitted
+f32/f64 literal. The machine-readable historical correction witness is
+`evidence/f64-root-cache-correction.json`.
 
 Development is tracked under Wavegen TIN-3715. Licensed under the
 [ISC License](LICENSE).

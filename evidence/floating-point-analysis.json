@@ -1,9 +1,9 @@
 {
   "authority": {
     "adjacent_composition_proof": "evidence/adjacent-composition-proof.json",
-    "adjacent_composition_proof_sha256": "45f119aa0fc5f78af50ada43f087786f6b4a797894ad51e7036606d0d33082ff",
+    "adjacent_composition_proof_sha256": "4c06360d36b2b36f29b80537988a3fedbbb8becd9a788baaf763984dd93420a7",
     "analyzer": "scripts/floating_point_analysis.py",
-    "analyzer_sha256": "c421961029e3dcf50b15e39d26102b8945f7bb7ea0301913af73d8a3d5e12c35",
+    "analyzer_sha256": "b053bbc6553796cde2c6890560f5eace3d398f71b47d27bd7cb96963ec91337f",
     "arithmetic": "exact Python fractions; binary64 is used only to encode outward summary bounds",
     "exact_real_evidence": "evidence/real-approximation-bounds.json",
     "exact_real_evidence_sha256": "dd3db2a6a2fb40d93826a3a5f476d882ef30d2f355b41ec587926d6df055af16",
@@ -34,8 +34,8 @@
   "maximum_intermediate_magnitude_upper_hex": "0x1.7328cc0000000p+32",
   "open_obligations": [
     {
-      "id": "FP-ROOT-SOLVER-ARITHMETIC",
-      "statement": "Bind the bracketed root solver's source arithmetic and stopping logic to certified root ULP/residual envelopes.",
+      "id": "FP-ROOT-SOLVER-MATHEMATICAL-ROOT-ENVELOPES",
+      "statement": "Bind the separately proved bracketed root-solver source graph to solver-output mathematical-root ULP and true-residual envelopes.",
       "status": "OPEN"
     },
     {
@@ -153,12 +153,12 @@
     }
   },
   "release_conformance": false,
-  "release_implication": "BLOCKED; source-graph evaluation proofs are not backend-lowering proofs or release envelopes, and root arithmetic remains open",
+  "release_implication": "BLOCKED; source-graph evaluation proofs are not backend-lowering proofs or release envelopes, and solver mathematical-root envelopes remain open",
   "schema_version": "futhark-bessel.floating-point-analysis.v2",
   "scope": {
     "composition_with_exact_real_bound": "PROVED_VIA_SHADOW_INDEX_ADJACENT_QUADRANT_COMPOSITION",
     "covered": "written Futhark J0/J1 source-operation order, including gradual-underflow absolute error terms, finite intermediates, the complete adjacent reduction partition, all quadrant maps, and composition with mathematical approximation bounds",
-    "excluded": "backend lowering equivalence, contraction/reassociation, root solver arithmetic, and runtime conformance"
+    "excluded": "backend lowering equivalence, contraction/reassociation, root solver mathematical-root ULP/true-residual envelopes, and runtime conformance"
   },
   "source_graph_results": {
     "f32": {

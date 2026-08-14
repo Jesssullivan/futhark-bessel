@@ -533,9 +533,9 @@ def correction_document(
                 "envelope |J1(r_hat)| <= 0x1p-48"
             ),
             "excluded": (
-                "positive_j1_root_solved arithmetic and stopping logic, the "
-                "implementation-reported approximate residual, and C/WASM/WebGPU "
-                "lowering or runtime conformance"
+                "positive_j1_root_solved mathematical-root ULP/true-residual "
+                "envelopes, implementation-reported residual backend conformance, "
+                "and C/WASM/WebGPU lowering or runtime conformance"
             ),
         },
     }
@@ -702,7 +702,7 @@ def release_implications() -> dict[str, str]:
         "f64_cached_root_ulp_and_mathematical_residual": "CERTIFIED",
         "f32_reported_residual": "BACKEND_CONFORMANCE_OPEN",
         "f64_reported_residual": "BACKEND_CONFORMANCE_OPEN",
-        "root_solver_arithmetic": "OPEN",
+        "solver_mathematical_root_ulp_and_true_residual": "OPEN",
         "backend_lowering_equivalence": "OPEN",
         "overall_release_status": "INCOMPLETE",
     }
@@ -729,9 +729,9 @@ def document(
                 "while a separate Arb computation and mpmath replay verify it"
             ),
             "excluded": (
-                "positive_j1_root_solved arithmetic and stopping logic, the "
-                "implementation-reported approximate residual, and C/WASM/WebGPU "
-                "lowering or runtime conformance"
+                "positive_j1_root_solved mathematical-root ULP/true-residual "
+                "envelopes, implementation-reported residual backend conformance, "
+                "and C/WASM/WebGPU lowering or runtime conformance"
             ),
         },
         "authority": {
@@ -856,8 +856,8 @@ def main() -> None:
         "OK all 256 cached f32/f64 roots are correctly rounded with certified "
         "true residual <= "
         f"{DECLARED_TRUE_RESIDUAL_ENVELOPE_HEX['f32']} (f32) and "
-        f"{DECLARED_TRUE_RESIDUAL_ENVELOPE_HEX['f64']} (f64); solver arithmetic "
-        "and backend conformance remain OPEN"
+        f"{DECLARED_TRUE_RESIDUAL_ENVELOPE_HEX['f64']} (f64); solver "
+        "mathematical-root envelopes and backend conformance remain OPEN"
     )
 
 

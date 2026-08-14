@@ -72,6 +72,14 @@ floating-point-analysis: adjacent-composition-proof
   python3 scripts/floating_point_analysis.py --check
   PYTHONPATH=scripts python3 scripts/test_evidence_fail_closed.py
 
+root-solver-proof:
+  python3 scripts/root_solver_proof.py --check
+  PYTHONPATH=scripts python3 scripts/test_root_solver_fail_closed.py
+
+root-solver-proof-write:
+  python3 scripts/root_solver_proof.py --write
+  PYTHONPATH=scripts python3 scripts/test_root_solver_fail_closed.py
+
 _root-envelope-ledger:
   mkdir -p build evidence
   cc -std=c11 -O2 -Wall -Wextra -Werror oracle/root_envelopes.c -lflint -lmpfr -lm -o build/root_envelopes
@@ -97,7 +105,7 @@ observed-envelopes:
 coeff-hash:
   python3 scripts/coefficient_hash.py
 
-check: fmt package check-source typecheck test-c compile-webgpu approximation-proof floating-point-analysis root-envelope-proof backend-conformance observed-envelopes coeff-hash
+check: fmt package check-source typecheck test-c compile-webgpu approximation-proof floating-point-analysis root-solver-proof root-envelope-proof backend-conformance observed-envelopes coeff-hash
   gitleaks dir --no-banner --redact .
 
 release-preflight: check

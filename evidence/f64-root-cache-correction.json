@@ -12,7 +12,7 @@
     "separate_envelope_oracle": "oracle/root_envelopes.c",
     "separate_envelope_oracle_sha256": "4404158ed8bbd96c024de45da8dc04ddf5d7171d3383d2159fb4b6f5f6fe9df4",
     "verifier": "scripts/root_envelope_proof.py",
-    "verifier_sha256": "f44dfcbeacf8138b8d9de4734a26377cfa819699254f6b8d0ec0d44983afdd84"
+    "verifier_sha256": "42a748c82c6774834345d6a62d006005ec7bd3c3f874a07ed896c7f06696ac74"
   },
   "correction": {
     "f32_changed_root_count": 0,
@@ -832,7 +832,7 @@
   "schema_version": "futhark-bessel.f64-root-cache-correction.v1",
   "scope": {
     "covered": "the historical f64 endpoint-selection defect, its root-1 witness and complete 256-root mismatch census, corrected cache binding, confirmation that all f32 root literals are unchanged, and the independently certified source-cache true-residual envelope |J1(r_hat)| <= 0x1p-48",
-    "excluded": "positive_j1_root_solved arithmetic and stopping logic, the implementation-reported approximate residual, and C/WASM/WebGPU lowering or runtime conformance"
+    "excluded": "positive_j1_root_solved mathematical-root ULP/true-residual envelopes, implementation-reported residual backend conformance, and C/WASM/WebGPU lowering or runtime conformance"
   },
   "status": "SOURCE_CACHE_GENERATOR_CORRECTED"
 }

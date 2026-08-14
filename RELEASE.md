@@ -17,9 +17,10 @@ have machine-readable evidence at the tagged commit.
       boundaries recorded by the separate approximation theorem.
 - [ ] Floating-point rounding/reassociation bounds and observed backend error
       envelopes are recorded separately for f32 and f64.
-      Source-evaluation bounds and sample-only regression ceilings now exist.
-      Exact range-reduction-index equality is falsified and its adjacent-cell
-      composition is proved. Backend-lowering equivalence, root arithmetic, and
+      Source-evaluation bounds, all-index source-graph root-solver arithmetic,
+      and sample-only regression ceilings now exist. Exact range-reduction-index
+      equality is falsified and its adjacent-cell composition is proved.
+      Backend-lowering equivalence, solver mathematical-root envelopes, and
       release envelopes remain open, so this gate stays unchecked.
 - [x] A deterministic pinned harness executes identical Arb-certified sample
       and root ledgers through the C and WASM runtimes and records observed
@@ -35,12 +36,14 @@ have machine-readable evidence at the tagged commit.
       rounded (zero ULP error), with the true mathematical residual envelope
       `|J1(r_hat)| <= 0x1p-19`. Evidence is in
       `evidence/f32-root-envelope.json`. This does not certify the recomputing
-      solver, its reported approximate residual, or backend lowering.
+      solver's mathematical-root envelope, a backend-reported residual, or
+      backend lowering.
 - [x] All 256 public cached f64 roots are independently certified as correctly
       rounded (zero ULP error), with the true mathematical residual envelope
       `|J1(r_hat)| <= 0x1p-48`. Evidence is in
       `evidence/f64-root-envelope.json`. This does not certify the recomputing
-      solver, its reported approximate residual, or backend lowering. The
+      solver's mathematical-root envelope, a backend-reported residual, or
+      backend lowering. The
       historical endpoint-selection correction is recorded in
       `evidence/f64-root-cache-correction.json`.
 - [x] Checked evaluation distinguishes `OK`, `OUT_OF_DOMAIN`, and `NONFINITE`;

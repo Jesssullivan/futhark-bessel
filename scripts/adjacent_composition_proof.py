@@ -693,7 +693,8 @@ def generate_summary() -> dict[str, Any]:
             ),
             "excluded": (
                 "C/WASM/WebGPU lowering equivalence, contraction/reassociation, "
-                "root-solver arithmetic, and runtime conformance"
+                "solver mathematical-root ULP/true-residual envelopes, and "
+                "runtime conformance"
             ),
             "partition_distinction": expected_distinction,
         },
@@ -749,7 +750,7 @@ def generate_summary() -> dict[str, Any]:
         "release_implications": {
             "adjacent_source_reduction_composition": "PROVED",
             "backend_lowering_equivalence": "OPEN",
-            "root_solver_arithmetic": "OPEN",
+            "solver_mathematical_root_ulp_and_true_residual": "OPEN",
             "overall_release_status": "INCOMPLETE",
         },
     }

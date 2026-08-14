@@ -1,0 +1,156 @@
+{
+  "authority": {
+    "analyzer": "scripts/root_solver_proof.py",
+    "analyzer_sha256": "274c4609e10e05fc207431c7c027ae5dcd9eed445e6807e7fc69c8fb98f80a80",
+    "arithmetic": "exact fractions with integer roundTiesToEven and integer-square comparison for correctly rounded sqrt",
+    "implementation_sha256": "2b459fb3e24e82a825db5f44cc8b3ebe9c8387d598235f84c4e80996b4e7d9d1",
+    "implementation_source": "lib/github.com/Jesssullivan/futhark-bessel/bessel_internal.fut",
+    "module_body_sha256": {
+      "f32": "9535debcc50d3efebbdbcae34641a712c7406ed5531e06aa431048bc349a9ebe",
+      "f64": "8c9170a38e1b51529574d3c098ee1f1e2ac312a2304eff9dcf4c8367f1fe9885"
+    },
+    "source_function_sha256": {
+      "f32": {
+        "hankel_sums": "a4aae6f610ec53f265992a23738cde0423eca6c7fcd369f97411d82617d7c0d0",
+        "j1_finite": "0f4274c0ca8d04f09637427926af4883975d7f3628e62a8ea7166a8648802b97",
+        "j1_series": "a2072b05fa518330fd3d394adcda52331bb53d043388aedb8201c791b2f174ee",
+        "j_asymptotic": "de5bef3e5e8c066f29e218fa6a15f6c8b15c7e5d7268bf89b27fab70c29ab0a4",
+        "positive_j1_root_solved": "f319db9467690e88b01d349e8a8460d5af90e78a5c85b8dff185e6357a2287a0",
+        "sign_change": "c9beebcece14ed45a2cf0fd4699e174bf77d48c3cc0ee01a9ab2b1d74a6f4a67",
+        "sincos_reduced": "9c994d39a82d086325965019d7b31fdc915300b780144e3886616e1e017af033"
+      },
+      "f64": {
+        "hankel_sums": "8ba65769d1bf73fce33389862aede1a10d7f13352dcfcc53f05388342f1e4190",
+        "j1_finite": "35e2c6fcc3d1844914711524230254a101d5c80711b34467347ee98caf16e4ac",
+        "j1_series": "a86b78af12a6d67321562f49f86e9694d1b9baa918519ae19e36d6a990ca2e0b",
+        "j_asymptotic": "f70a4bdfc52f8278ec591a094db9c9c70c072e1e42bd965d2cc8cca23a31f04d",
+        "positive_j1_root_solved": "1709dba4c9b197e1ada7c87453e27892af915566b899e85cdf0cb1ecc07d083d",
+        "sign_change": "461f4ad3b670b540358effc0b7c8173416561cfff2249beb79c1865622bd5610",
+        "sincos_reduced": "20580709a51226cdb2481fa5a940a8009e07dca928b8021bc25005249bb4688a"
+      }
+    }
+  },
+  "declared_primitive_semantics": {
+    "add_subtract_multiply_divide": "one IEEE-754 roundTiesToEven operation in the named precision, gradual underflow, no contraction",
+    "evaluation_order": "strict written source tree without reassociation",
+    "inputs_and_binary_literals": "exact IEEE values",
+    "round": "nearest integral value with ties to even",
+    "sqrt": "correctly rounded IEEE-754 roundTiesToEven in the named precision"
+  },
+  "proof_obligations": {
+    "bisection_sign_bracket_invariant": "PROVED",
+    "finite_valid_initial_arithmetic": "PROVED",
+    "implementation_reported_residual_source_semantics": "PROVED",
+    "initial_source_evaluation_sign_bracket": "PROVED",
+    "returned_midpoint_and_converged_flag": "PROVED",
+    "strict_progress_and_stopping_before_cap": "PROVED"
+  },
+  "release_conformance": false,
+  "release_implications": {
+    "backend_lowering_equivalence": "OPEN",
+    "implementation_reported_residual_backend_conformance": "OPEN",
+    "implementation_reported_residual_source_semantics": "PROVED",
+    "overall_release_status": "INCOMPLETE",
+    "root_solver_source_graph_arithmetic": "PROVED",
+    "solver_mathematical_root_ulp_and_true_residual": "OPEN"
+  },
+  "results": {
+    "f32": {
+      "all_reported_residuals_finite_nonnegative": true,
+      "all_stopped_at_or_below_written_tolerance": true,
+      "all_stopped_before_iteration_cap": true,
+      "index_count": 256,
+      "index_domain": {
+        "maximum": 256,
+        "minimum": 1
+      },
+      "initial_source_evaluation_brackets": 256,
+      "iteration_cap": 48,
+      "maximum_final_width": {
+        "bits": "0x39c00000",
+        "hex": "0x1.8000000000000p-12",
+        "index": 245
+      },
+      "maximum_iteration_indices": [
+        1
+      ],
+      "maximum_iterations": 20,
+      "maximum_reported_residual": {
+        "bits": "0x368e4ded",
+        "hex": "0x1.1c9bda0000000p-18",
+        "index": 167
+      },
+      "maximum_written_tolerance": {
+        "bits": "0x39c9421f",
+        "hex": "0x1.92843e0000000p-12",
+        "index": 256
+      },
+      "minimum_iterations": 12,
+      "preserved_source_evaluation_brackets": true,
+      "reported_residual_semantics": "bit-exact abs(j1_finite(returned_root)) under the same source graph",
+      "result_root_inside_final_bracket": true,
+      "status": "SOURCE_GRAPH_ARITHMETIC_PROVED",
+      "strict_midpoint_and_width_progress": true,
+      "transcript": {
+        "canonicalization": "UTF-8 JSON Lines, sorted keys, compact separators",
+        "events": "initial, every bisection iteration, final",
+        "row_count": 4084,
+        "sha256": "08cf214b172106eac8e0e9b56ed92005aea28dc920fed2988f54cbc9ad5ed16e"
+      }
+    },
+    "f64": {
+      "all_reported_residuals_finite_nonnegative": true,
+      "all_stopped_at_or_below_written_tolerance": true,
+      "all_stopped_before_iteration_cap": true,
+      "index_count": 256,
+      "index_domain": {
+        "maximum": 256,
+        "minimum": 1
+      },
+      "initial_source_evaluation_brackets": 256,
+      "iteration_cap": 96,
+      "maximum_final_width": {
+        "bits": "0x3d68000000000000",
+        "hex": "0x1.8000000000000p-41",
+        "index": 245
+      },
+      "maximum_iteration_indices": [
+        1
+      ],
+      "maximum_iterations": 49,
+      "maximum_reported_residual": {
+        "bits": "0x3d2d75f2fd6a7c59",
+        "hex": "0x1.d75f2fd6a7c59p-45",
+        "index": 3
+      },
+      "maximum_written_tolerance": {
+        "bits": "0x3d692843d3193e23",
+        "hex": "0x1.92843d3193e23p-41",
+        "index": 256
+      },
+      "minimum_iterations": 41,
+      "preserved_source_evaluation_brackets": true,
+      "reported_residual_semantics": "bit-exact abs(j1_finite(returned_root)) under the same source graph",
+      "result_root_inside_final_bracket": true,
+      "status": "SOURCE_GRAPH_ARITHMETIC_PROVED",
+      "strict_midpoint_and_width_progress": true,
+      "transcript": {
+        "canonicalization": "UTF-8 JSON Lines, sorted keys, compact separators",
+        "events": "initial, every bisection iteration, final",
+        "row_count": 11508,
+        "sha256": "14956fd6936dfe4a2904d3b52d65115795456d22dba0c0fa86b22ffddf4d5fbb"
+      }
+    }
+  },
+  "schema_version": "futhark-bessel.root-solver-arithmetic.v1",
+  "scope": {
+    "covered": "positive_j1_root_solved on every valid public cached-root index 1..256, separately for f32 and f64: written initial arithmetic, source-evaluation sign brackets, every bisection update, strict progress, stopping, returned midpoint, convergence flag, and implementation-reported residual construction",
+    "excluded": [
+      "cached-root literal certificates and their true mathematical residual envelopes",
+      "solver-root ULP error, proximity to the mathematical J1 root, and true mathematical residual envelopes",
+      "C/WASM/WebGPU lowering, contraction, reassociation, and runtime conformance",
+      "behavior outside the valid root-index domain 1..256"
+    ]
+  },
+  "status": "SOURCE_GRAPH_ROOT_SOLVER_ARITHMETIC_PROVED"
+}

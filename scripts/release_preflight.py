@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Release remains deliberately fail-closed until certified gates exist."""
 
+import hashlib
 import json
 from pathlib import Path
 
@@ -28,6 +29,9 @@ root_envelopes = {
 }
 root_correction = json.loads(
     Path("evidence/f64-root-cache-correction.json").read_text()
+)
+root_solver = json.loads(
+    Path("evidence/root-solver-arithmetic.json").read_text()
 )
 
 if observations.get("status") != "OBSERVED_BASELINE_NOT_RELEASE_CONFORMANCE":
@@ -67,7 +71,7 @@ if adjacent.get("release_implications") != {
     "adjacent_source_reduction_composition": "PROVED",
     "backend_lowering_equivalence": "OPEN",
     "overall_release_status": "INCOMPLETE",
-    "root_solver_arithmetic": "OPEN",
+    "solver_mathematical_root_ulp_and_true_residual": "OPEN",
 }:
     raise SystemExit("BLOCKED: adjacent proof release boundary drifted")
 if floating_point.get("closed_obligations") != [
@@ -89,7 +93,7 @@ if {item.get("status") for item in floating_point.get("open_obligations", [])} !
 if len(floating_point.get("open_obligations", [])) != 4:
     raise SystemExit("BLOCKED: expected four explicit floating-point obligations")
 expected_obligations = {
-    "FP-ROOT-SOLVER-ARITHMETIC",
+    "FP-ROOT-SOLVER-MATHEMATICAL-ROOT-ENVELOPES",
     "FP-BACKEND-LOWERING-C",
     "FP-BACKEND-LOWERING-WASM",
     "FP-BACKEND-LOWERING-WEBGPU",
@@ -146,7 +150,7 @@ expected_root_implications = {
     "f64_cached_root_ulp_and_mathematical_residual": "CERTIFIED",
     "f64_reported_residual": "BACKEND_CONFORMANCE_OPEN",
     "overall_release_status": "INCOMPLETE",
-    "root_solver_arithmetic": "OPEN",
+    "solver_mathematical_root_ulp_and_true_residual": "OPEN",
 }
 expected_root_residuals = {
     "f32": "0x1.0000000000000p-19",
@@ -175,6 +179,76 @@ if root_correction.get("status") != "SOURCE_CACHE_GENERATOR_CORRECTED":
     raise SystemExit("BLOCKED: f64 root-cache correction witness is missing")
 if root_correction.get("release_conformance") is not False:
     raise SystemExit("BLOCKED: cache correction cannot confer backend conformance")
+if root_solver.get("schema_version") != (
+    "futhark-bessel.root-solver-arithmetic.v1"
+):
+    raise SystemExit("BLOCKED: root-solver arithmetic schema drifted")
+if root_solver.get("status") != "SOURCE_GRAPH_ROOT_SOLVER_ARITHMETIC_PROVED":
+    raise SystemExit("BLOCKED: root-solver source-graph proof is missing")
+if root_solver.get("release_conformance") is not False:
+    raise SystemExit("BLOCKED: source-graph root proof cannot confer conformance")
+expected_solver_implications = {
+    "backend_lowering_equivalence": "OPEN",
+    "implementation_reported_residual_backend_conformance": "OPEN",
+    "implementation_reported_residual_source_semantics": "PROVED",
+    "overall_release_status": "INCOMPLETE",
+    "root_solver_source_graph_arithmetic": "PROVED",
+    "solver_mathematical_root_ulp_and_true_residual": "OPEN",
+}
+if root_solver.get("release_implications") != expected_solver_implications:
+    raise SystemExit("BLOCKED: root-solver release boundary drifted")
+expected_solver_obligations = {
+    "bisection_sign_bracket_invariant": "PROVED",
+    "finite_valid_initial_arithmetic": "PROVED",
+    "implementation_reported_residual_source_semantics": "PROVED",
+    "initial_source_evaluation_sign_bracket": "PROVED",
+    "returned_midpoint_and_converged_flag": "PROVED",
+    "strict_progress_and_stopping_before_cap": "PROVED",
+}
+if root_solver.get("proof_obligations") != expected_solver_obligations:
+    raise SystemExit("BLOCKED: root-solver source obligation is not proved")
+solver_authority = root_solver.get("authority", {})
+for field, path in {
+    "implementation": Path(
+        "lib/github.com/Jesssullivan/futhark-bessel/bessel_internal.fut"
+    ),
+    "analyzer": Path("scripts/root_solver_proof.py"),
+}.items():
+    authority_field = f"{field}_source" if field == "implementation" else field
+    if solver_authority.get(authority_field) != str(path):
+        raise SystemExit(f"BLOCKED: root-solver {field} path drifted")
+    if solver_authority.get(f"{field}_sha256") != hashlib.sha256(
+        path.read_bytes()
+    ).hexdigest():
+        raise SystemExit(f"BLOCKED: root-solver {field} SHA drifted")
+for precision, cap in (("f32", 48), ("f64", 96)):
+    result = root_solver.get("results", {}).get(precision, {})
+    if (
+        result.get("status") != "SOURCE_GRAPH_ARITHMETIC_PROVED"
+        or result.get("index_domain") != {"minimum": 1, "maximum": 256}
+        or result.get("index_count") != 256
+        or result.get("initial_source_evaluation_brackets") != 256
+        or result.get("iteration_cap") != cap
+        or result.get("preserved_source_evaluation_brackets") is not True
+        or result.get("strict_midpoint_and_width_progress") is not True
+        or result.get("all_stopped_before_iteration_cap") is not True
+        or result.get("all_stopped_at_or_below_written_tolerance") is not True
+        or result.get("result_root_inside_final_bracket") is not True
+        or result.get("reported_residual_semantics")
+        != "bit-exact abs(j1_finite(returned_root)) under the same source graph"
+        or result.get("all_reported_residuals_finite_nonnegative") is not True
+    ):
+        raise SystemExit(f"BLOCKED: {precision} root-solver coverage drifted")
+    transcript = result.get("transcript", {})
+    digest = transcript.get("sha256")
+    if (
+        not isinstance(transcript.get("row_count"), int)
+        or transcript["row_count"] <= 512
+        or not isinstance(digest, str)
+        or len(digest) != 64
+        or any(character not in "0123456789abcdef" for character in digest)
+    ):
+        raise SystemExit(f"BLOCKED: {precision} root-solver transcript drifted")
 if root_correction.get("pre_fix", {}).get("first_witness") != {
     "cached_bits": "0x400ea75575af6f08",
     "certified_bits": "0x400ea75575af6f09",
@@ -242,6 +316,24 @@ if root_correction.get("correction", {}).get(
 ) != 0:
     raise SystemExit("BLOCKED: corrected cache still has root ULP mismatches")
 root_budget = error_budget.get("root_evidence", {})
+if error_budget.get("root_evidence", {}).get("status") != (
+    "SOURCE_CACHE_AND_SOLVER_GRAPH_CERTIFIED_MATHEMATICAL_SOLVER_ENVELOPES_AND_BACKENDS_OPEN"
+):
+    raise SystemExit("BLOCKED: root error-budget boundary drifted")
+if root_budget.get("root_solver_source_graph") != {
+    "evidence": "evidence/root-solver-arithmetic.json",
+    "scope": (
+        "all valid indices 1..256 separately in f32/f64; source arithmetic, "
+        "sign-bracket invariant, stopping, result record, and reported-residual "
+        "construction"
+    ),
+    "status": "SOURCE_GRAPH_ARITHMETIC_PROVED",
+    "excluded": (
+        "solver-root mathematical ULP/true-residual envelopes and C/WASM/WebGPU "
+        "lowering or runtime conformance"
+    ),
+}:
+    raise SystemExit("BLOCKED: root-solver error-budget entry drifted")
 for precision in ("f32", "f64"):
     if root_budget.get(f"{precision}_release_ulp_envelope", {}).get(
         "maximum_ulp_error"
