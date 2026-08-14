@@ -12,7 +12,7 @@
     "separate_envelope_oracle": "oracle/root_envelopes.c",
     "separate_envelope_oracle_sha256": "4404158ed8bbd96c024de45da8dc04ddf5d7171d3383d2159fb4b6f5f6fe9df4",
     "verifier": "scripts/root_envelope_proof.py",
-    "verifier_sha256": "e5b34448fb39f460734b76c74ee6b8b5eae6633e6940dd773c29968fa4dc3a76"
+    "verifier_sha256": "f44dfcbeacf8138b8d9de4734a26377cfa819699254f6b8d0ec0d44983afdd84"
   },
   "correction": {
     "f32_changed_root_count": 0,
@@ -29,7 +29,7 @@
     "root_cache_sha256": "a9c4aa56f0e757a4df8cff4d4a4f7290a7a481c81c14e0f3cc464dfb24bab086"
   },
   "pre_fix": {
-    "commit": "715f165eb715b9512d867c30ed0da7c6d4ef6765",
+    "commit": "6efb9fe4f26bede371dd442c29e3c0d0f4e996e2",
     "defect": "the renderer evaluated the midpoint expression for adjacent f64 endpoints in binary64; adding the representable half-ULP to an endpoint is a halfway rounding tie, so it selected an endpoint by ties-to-even instead of by the mathematical root's position relative to the real midpoint",
     "f32_mismatched_root_count": 0,
     "f64_corrections": [

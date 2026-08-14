@@ -7,7 +7,7 @@
     "implementation_sha256": "2b459fb3e24e82a825db5f44cc8b3ebe9c8387d598235f84c4e80996b4e7d9d1",
     "independent_library": "mpmath 1.4.1 besselj/besseljzero",
     "independent_verifier": "scripts/root_envelope_proof.py",
-    "independent_verifier_sha256": "e5b34448fb39f460734b76c74ee6b8b5eae6633e6940dd773c29968fa4dc3a76",
+    "independent_verifier_sha256": "f44dfcbeacf8138b8d9de4734a26377cfa819699254f6b8d0ec0d44983afdd84",
     "oracle": "oracle/root_envelopes.c",
     "oracle_sha256": "4404158ed8bbd96c024de45da8dc04ddf5d7171d3383d2159fb4b6f5f6fe9df4",
     "root_cache": "lib/github.com/Jesssullivan/futhark-bessel/root_cache.fut",
