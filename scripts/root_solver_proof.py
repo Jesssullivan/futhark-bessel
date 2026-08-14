@@ -807,7 +807,7 @@ def generate() -> dict[str, Any]:
             ),
             "excluded": [
                 "cached-root literal certificates and their true mathematical residual envelopes",
-                "solver-root ULP error, proximity to the mathematical J1 root, and true mathematical residual envelopes",
+                "solver-root ULP error, proximity to the mathematical J1 root, and true mathematical residual envelopes (certified by separate evidence/solver-root-envelopes.json)",
                 "C/WASM/WebGPU lowering, contraction, reassociation, and runtime conformance",
                 "behavior outside the valid root-index domain 1..256",
             ],
@@ -846,7 +846,7 @@ def generate() -> dict[str, Any]:
         "release_implications": {
             "root_solver_source_graph_arithmetic": "PROVED",
             "implementation_reported_residual_source_semantics": "PROVED",
-            "solver_mathematical_root_ulp_and_true_residual": "OPEN",
+            "solver_mathematical_root_ulp_and_true_residual": "CERTIFIED_SEPARATE_EVIDENCE",
             "implementation_reported_residual_backend_conformance": "OPEN",
             "backend_lowering_equivalence": "OPEN",
             "overall_release_status": "INCOMPLETE",
@@ -873,7 +873,7 @@ def main() -> None:
     print(
         "OK f32/f64 positive_j1_root_solved source arithmetic, stopping, and "
         "reported-residual semantics are proved for indices 1..256; mathematical "
-        "root envelopes and backend conformance remain OPEN"
+        "root envelopes are separate evidence and backend conformance remains OPEN"
     )
 
 

@@ -1,9 +1,9 @@
 {
   "authority": {
     "adjacent_composition_proof": "evidence/adjacent-composition-proof.json",
-    "adjacent_composition_proof_sha256": "4c06360d36b2b36f29b80537988a3fedbbb8becd9a788baaf763984dd93420a7",
+    "adjacent_composition_proof_sha256": "2a8919aa138492037b7f3f9ac1b676bba4791137ad107c6a7844069f33d77a69",
     "analyzer": "scripts/floating_point_analysis.py",
-    "analyzer_sha256": "b053bbc6553796cde2c6890560f5eace3d398f71b47d27bd7cb96963ec91337f",
+    "analyzer_sha256": "fc0b210903e9e949e1935dcc9c9724c7886256c779959bd56d96367d898ad281",
     "arithmetic": "exact Python fractions; binary64 is used only to encode outward summary bounds",
     "exact_real_evidence": "evidence/real-approximation-bounds.json",
     "exact_real_evidence_sha256": "dd3db2a6a2fb40d93826a3a5f476d882ef30d2f355b41ec587926d6df055af16",
@@ -13,6 +13,8 @@
       "f32": "9535debcc50d3efebbdbcae34641a712c7406ed5531e06aa431048bc349a9ebe",
       "f64": "8c9170a38e1b51529574d3c098ee1f1e2ac312a2304eff9dcf4c8367f1fe9885"
     },
+    "solver_root_envelopes": "evidence/solver-root-envelopes.json",
+    "solver_root_envelopes_sha256": "cb01a1d7fb119bf66a4331ab63e80ca104373eded544f822cdc8b687d5508d68",
     "transition_band_authority": "evidence/adjacent-reduction-bands.json",
     "transition_band_authority_sha256": "038676e5847ec006ff524b470774f480dfdb6b5c8e79e7a0e143bbce79d04420"
   },
@@ -20,6 +22,11 @@
     {
       "id": "FP-ADJACENT-REDUCTION-COMPOSITION",
       "statement": "Every exact-rational floating transition band, both adjacent selected quadrants, the shadow radius, and the Taylor/phase/Hankel composition are certified.",
+      "status": "PROVED"
+    },
+    {
+      "id": "FP-ROOT-SOLVER-MATHEMATICAL-ROOT-ENVELOPES",
+      "statement": "Every bit-exact source-graph solver output is joined to the certified mathematical-root reference bits and an independent Arb/mpmath true-residual enclosure.",
       "status": "PROVED"
     }
   ],
@@ -33,11 +40,6 @@
   },
   "maximum_intermediate_magnitude_upper_hex": "0x1.7328cc0000000p+32",
   "open_obligations": [
-    {
-      "id": "FP-ROOT-SOLVER-MATHEMATICAL-ROOT-ENVELOPES",
-      "statement": "Bind the separately proved bracketed root-solver source graph to solver-output mathematical-root ULP and true-residual envelopes.",
-      "status": "OPEN"
-    },
     {
       "id": "FP-BACKEND-LOWERING-C",
       "statement": "Pinned Futhark C lowering and compiler flags implement one analyzed operation graph and the declared primitive semantics.",
@@ -153,12 +155,26 @@
     }
   },
   "release_conformance": false,
-  "release_implication": "BLOCKED; source-graph evaluation proofs are not backend-lowering proofs or release envelopes, and solver mathematical-root envelopes remain open",
+  "release_implication": "BLOCKED; source-graph evaluation proofs are not backend-lowering proofs or release envelopes; C/WASM/WebGPU lowering and runtime conformance remain open",
   "schema_version": "futhark-bessel.floating-point-analysis.v2",
   "scope": {
     "composition_with_exact_real_bound": "PROVED_VIA_SHADOW_INDEX_ADJACENT_QUADRANT_COMPOSITION",
-    "covered": "written Futhark J0/J1 source-operation order, including gradual-underflow absolute error terms, finite intermediates, the complete adjacent reduction partition, all quadrant maps, and composition with mathematical approximation bounds",
-    "excluded": "backend lowering equivalence, contraction/reassociation, root solver mathematical-root ULP/true-residual envelopes, and runtime conformance"
+    "covered": "written Futhark J0/J1 source-operation order, including gradual-underflow absolute error terms, finite intermediates, the complete adjacent reduction partition, all quadrant maps, composition with mathematical approximation bounds, and the separately certified all-index source-solver mathematical-root ULP/true-residual envelopes",
+    "excluded": "backend lowering equivalence, contraction/reassociation, solver bracket containment, and runtime conformance"
+  },
+  "solver_root_envelopes": {
+    "f32": {
+      "root_count": 256,
+      "root_ulp_error_upper": 3,
+      "status": "CERTIFIED_SOURCE_GRAPH",
+      "true_residual_abs_upper_hex": "0x1.2c3683a1de614p-18"
+    },
+    "f64": {
+      "root_count": 256,
+      "root_ulp_error_upper": 21203,
+      "status": "CERTIFIED_SOURCE_GRAPH",
+      "true_residual_abs_upper_hex": "0x1.215d7b11c58aap-37"
+    }
   },
   "source_graph_results": {
     "f32": {

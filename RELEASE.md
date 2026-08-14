@@ -18,10 +18,11 @@ have machine-readable evidence at the tagged commit.
 - [ ] Floating-point rounding/reassociation bounds and observed backend error
       envelopes are recorded separately for f32 and f64.
       Source-evaluation bounds, all-index source-graph root-solver arithmetic,
-      and sample-only regression ceilings now exist. Exact range-reduction-index
+      solver-output mathematical-root ULP/true-residual envelopes, and
+      sample-only regression ceilings now exist. Exact range-reduction-index
       equality is falsified and its adjacent-cell composition is proved.
-      Backend-lowering equivalence, solver mathematical-root envelopes, and
-      release envelopes remain open, so this gate stays unchecked.
+      Backend-lowering equivalence and release envelopes remain open, so this
+      gate stays unchecked.
 - [x] A deterministic pinned harness executes identical Arb-certified sample
       and root ledgers through the C and WASM runtimes and records observed
       absolute, ULP, and residual maxima by precision, domain, and backend.
@@ -35,15 +36,17 @@ have machine-readable evidence at the tagged commit.
 - [x] All 256 public cached f32 roots are independently certified as correctly
       rounded (zero ULP error), with the true mathematical residual envelope
       `|J1(r_hat)| <= 0x1p-19`. Evidence is in
-      `evidence/f32-root-envelope.json`. This does not certify the recomputing
-      solver's mathematical-root envelope, a backend-reported residual, or
-      backend lowering.
+      `evidence/f32-root-envelope.json`. The recomputing solver has separate
+      source-graph mathematical-root evidence in
+      `evidence/solver-root-envelopes.json`; neither theorem certifies a
+      backend-reported residual or backend lowering.
 - [x] All 256 public cached f64 roots are independently certified as correctly
       rounded (zero ULP error), with the true mathematical residual envelope
       `|J1(r_hat)| <= 0x1p-48`. Evidence is in
-      `evidence/f64-root-envelope.json`. This does not certify the recomputing
-      solver's mathematical-root envelope, a backend-reported residual, or
-      backend lowering. The
+      `evidence/f64-root-envelope.json`. The recomputing solver has separate
+      source-graph mathematical-root evidence in
+      `evidence/solver-root-envelopes.json`; neither theorem certifies a
+      backend-reported residual or backend lowering. The
       historical endpoint-selection correction is recorded in
       `evidence/f64-root-cache-correction.json`.
 - [x] Checked evaluation distinguishes `OK`, `OUT_OF_DOMAIN`, and `NONFINITE`;

@@ -12,7 +12,7 @@
     "implementation_source": "lib/github.com/Jesssullivan/futhark-bessel/bessel_internal.fut",
     "independent_verifier": "scripts/adjacent_composition_proof.py",
     "independent_verifier_runtime": "mpmath 1.4.1 at 180 decimal digits",
-    "independent_verifier_sha256": "7d6132c17eace3962d4c62cbe64b62a2c30cbc2a3646dad4f2aae1ddd0b20e12",
+    "independent_verifier_sha256": "7c2f060cdca547f349af8b2fc8dd4f8089046fdd59396432d7c08981176a3a67",
     "transition_bands": "evidence/adjacent-reduction-bands.json",
     "transition_bands_sha256": "038676e5847ec006ff524b470774f480dfdb6b5c8e79e7a0e143bbce79d04420",
     "transition_generator": "scripts/adjacent_reduction_bands.py",
@@ -64,13 +64,13 @@
     "adjacent_source_reduction_composition": "PROVED",
     "backend_lowering_equivalence": "OPEN",
     "overall_release_status": "INCOMPLETE",
-    "solver_mathematical_root_ulp_and_true_residual": "OPEN"
+    "solver_mathematical_root_ulp_and_true_residual": "CERTIFIED_SEPARATE_EVIDENCE"
   },
   "schema_version": "futhark-bessel.adjacent-composition-proof.v1",
   "scope": {
     "covered": "complete floating transition-band partition, both selected adjacent quadrants, shadow-index reduced radius, Taylor phase reconstruction, DLMF Hankel remainders, and prefactor discrepancy",
     "domain": "representable source inputs with switch < |x| <= 1024",
-    "excluded": "C/WASM/WebGPU lowering equivalence, contraction/reassociation, solver mathematical-root ULP/true-residual envelopes, and runtime conformance",
+    "excluded": "C/WASM/WebGPU lowering equivalence, contraction/reassociation, solver mathematical-root ULP/true-residual envelopes (certified by separate evidence/solver-root-envelopes.json), and runtime conformance",
     "partition_distinction": "These are floating source-reduction transition bands, not the 2,584 canonical exact-real cell boundaries in the separate approximation ledger.",
     "primitive_semantics": "strict written source graph; one IEEE-754 roundTiesToEven per primitive; gradual underflow; no contraction or reassociation"
   },

@@ -1,7 +1,7 @@
 {
   "authority": {
     "analyzer": "scripts/root_solver_proof.py",
-    "analyzer_sha256": "274c4609e10e05fc207431c7c027ae5dcd9eed445e6807e7fc69c8fb98f80a80",
+    "analyzer_sha256": "46c50263f9c62c63fac3477779dbdc5e02855add4b738bd32a42ddad6475153d",
     "arithmetic": "exact fractions with integer roundTiesToEven and integer-square comparison for correctly rounded sqrt",
     "implementation_sha256": "2b459fb3e24e82a825db5f44cc8b3ebe9c8387d598235f84c4e80996b4e7d9d1",
     "implementation_source": "lib/github.com/Jesssullivan/futhark-bessel/bessel_internal.fut",
@@ -52,7 +52,7 @@
     "implementation_reported_residual_source_semantics": "PROVED",
     "overall_release_status": "INCOMPLETE",
     "root_solver_source_graph_arithmetic": "PROVED",
-    "solver_mathematical_root_ulp_and_true_residual": "OPEN"
+    "solver_mathematical_root_ulp_and_true_residual": "CERTIFIED_SEPARATE_EVIDENCE"
   },
   "results": {
     "f32": {
@@ -147,7 +147,7 @@
     "covered": "positive_j1_root_solved on every valid public cached-root index 1..256, separately for f32 and f64: written initial arithmetic, source-evaluation sign brackets, every bisection update, strict progress, stopping, returned midpoint, convergence flag, and implementation-reported residual construction",
     "excluded": [
       "cached-root literal certificates and their true mathematical residual envelopes",
-      "solver-root ULP error, proximity to the mathematical J1 root, and true mathematical residual envelopes",
+      "solver-root ULP error, proximity to the mathematical J1 root, and true mathematical residual envelopes (certified by separate evidence/solver-root-envelopes.json)",
       "C/WASM/WebGPU lowering, contraction, reassociation, and runtime conformance",
       "behavior outside the valid root-index domain 1..256"
     ]

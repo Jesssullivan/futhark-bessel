@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 import shutil
@@ -455,7 +456,19 @@ def test_release_preflight_root_boundaries() -> None:
         )
         scripts = fixture / "scripts"
         scripts.mkdir()
-        shutil.copy(ROOT / "scripts/root_solver_proof.py", scripts)
+        for source in (
+            "scripts/root_solver_proof.py",
+            "scripts/solver_root_manifest.py",
+            "scripts/solver_root_envelope_proof.py",
+        ):
+            shutil.copy(ROOT / source, scripts)
+        oracle = fixture / "oracle"
+        oracle.mkdir()
+        for source in (
+            "oracle/arb_oracle.c",
+            "oracle/solver_root_envelopes.c",
+        ):
+            shutil.copy(ROOT / source, oracle)
 
         require_preflight_reason(fixture, "5 release gates remain unchecked")
 
@@ -481,6 +494,18 @@ def test_release_preflight_root_boundaries() -> None:
         floating_path.write_text(json.dumps(floating))
         require_preflight_reason(fixture, "floating-point obligation set drifted")
 
+        shutil.copy(ROOT / "evidence/floating-point-analysis.json", floating_path)
+        envelope_path = fixture / "evidence/solver-root-envelopes.json"
+        envelope = json.loads(envelope_path.read_text())
+        envelope["envelopes"]["f64"]["root_ulp_error_upper"] = 21202
+        envelope_path.write_text(json.dumps(envelope))
+        floating = json.loads(floating_path.read_text())
+        floating["authority"]["solver_root_envelopes_sha256"] = hashlib.sha256(
+            envelope_path.read_bytes()
+        ).hexdigest()
+        floating_path.write_text(json.dumps(floating))
+        require_preflight_reason(fixture, "f64 solver-root envelope drifted")
+
 
 def run_source_bundle(directory: Path) -> str:
     completed = subprocess.run(
@@ -499,7 +524,12 @@ def test_source_bundle_membership_and_sensitivity() -> None:
     root_solver_paths = (
         "scripts/root_solver_proof.py",
         "scripts/test_root_solver_fail_closed.py",
+        "oracle/solver_root_envelopes.c",
+        "scripts/solver_root_manifest.py",
+        "scripts/solver_root_envelope_proof.py",
+        "scripts/test_solver_root_envelope_fail_closed.py",
         "evidence/root-solver-arithmetic.json",
+        "evidence/solver-root-envelopes.json",
     )
     for path in root_solver_paths:
         if source.count(f'Path("{path}")') != 1:

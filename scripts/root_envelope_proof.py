@@ -702,7 +702,7 @@ def release_implications() -> dict[str, str]:
         "f64_cached_root_ulp_and_mathematical_residual": "CERTIFIED",
         "f32_reported_residual": "BACKEND_CONFORMANCE_OPEN",
         "f64_reported_residual": "BACKEND_CONFORMANCE_OPEN",
-        "solver_mathematical_root_ulp_and_true_residual": "OPEN",
+        "solver_mathematical_root_ulp_and_true_residual": "CERTIFIED_SEPARATE_EVIDENCE",
         "backend_lowering_equivalence": "OPEN",
         "overall_release_status": "INCOMPLETE",
     }
@@ -730,8 +730,9 @@ def document(
             ),
             "excluded": (
                 "positive_j1_root_solved mathematical-root ULP/true-residual "
-                "envelopes, implementation-reported residual backend conformance, "
-                "and C/WASM/WebGPU lowering or runtime conformance"
+                "envelopes (certified by separate evidence/solver-root-envelopes.json), "
+                "implementation-reported residual backend conformance, and "
+                "C/WASM/WebGPU lowering or runtime conformance"
             ),
         },
         "authority": {

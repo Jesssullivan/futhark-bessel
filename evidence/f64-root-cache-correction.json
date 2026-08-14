@@ -12,7 +12,7 @@
     "separate_envelope_oracle": "oracle/root_envelopes.c",
     "separate_envelope_oracle_sha256": "4404158ed8bbd96c024de45da8dc04ddf5d7171d3383d2159fb4b6f5f6fe9df4",
     "verifier": "scripts/root_envelope_proof.py",
-    "verifier_sha256": "42a748c82c6774834345d6a62d006005ec7bd3c3f874a07ed896c7f06696ac74"
+    "verifier_sha256": "e3a1985c3c92e0892fabf1a211f3851faeb8d0b2019d3c71e0f42aec2147d12a"
   },
   "correction": {
     "f32_changed_root_count": 0,

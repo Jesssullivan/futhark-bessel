@@ -68,7 +68,7 @@ adjacent-composition-proof: _adjacent-composition-ledger
 adjacent-composition-proof-write: _adjacent-composition-ledger
   python3 scripts/adjacent_composition_proof.py --write
 
-floating-point-analysis: adjacent-composition-proof
+floating-point-analysis: adjacent-composition-proof solver-root-envelope-proof
   python3 scripts/floating_point_analysis.py --check
   PYTHONPATH=scripts python3 scripts/test_evidence_fail_closed.py
 
@@ -79,6 +79,20 @@ root-solver-proof:
 root-solver-proof-write:
   python3 scripts/root_solver_proof.py --write
   PYTHONPATH=scripts python3 scripts/test_root_solver_fail_closed.py
+
+_solver-root-envelope-ledger: evidence root-solver-proof
+  mkdir -p build evidence
+  PYTHONPATH=scripts python3 scripts/solver_root_manifest.py --write
+  cc -std=c11 -O2 -Wall -Wextra -Werror oracle/solver_root_envelopes.c -lflint -lmpfr -lm -o build/solver_root_envelopes
+  build/solver_root_envelopes evidence/solver-root-outputs.jsonl > evidence/solver-root-envelope-certificates.jsonl
+
+solver-root-envelope-proof: _solver-root-envelope-ledger
+  PYTHONPATH=scripts python3 scripts/solver_root_envelope_proof.py --check
+  PYTHONPATH=scripts python3 scripts/test_solver_root_envelope_fail_closed.py
+
+solver-root-envelope-proof-write: _solver-root-envelope-ledger
+  PYTHONPATH=scripts python3 scripts/solver_root_envelope_proof.py --write
+  PYTHONPATH=scripts python3 scripts/test_solver_root_envelope_fail_closed.py
 
 _root-envelope-ledger:
   mkdir -p build evidence
@@ -105,7 +119,7 @@ observed-envelopes:
 coeff-hash:
   python3 scripts/coefficient_hash.py
 
-check: fmt package check-source typecheck test-c compile-webgpu approximation-proof floating-point-analysis root-solver-proof root-envelope-proof backend-conformance observed-envelopes coeff-hash
+check: fmt package check-source typecheck test-c compile-webgpu approximation-proof root-solver-proof root-envelope-proof solver-root-envelope-proof floating-point-analysis backend-conformance observed-envelopes coeff-hash
   gitleaks dir --no-banner --redact .
 
 release-preflight: check

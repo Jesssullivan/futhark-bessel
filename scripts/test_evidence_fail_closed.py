@@ -208,6 +208,64 @@ def test_adjacent_authority_binding() -> None:
     floating.ADJACENT_PROOF = original_path
 
 
+def test_solver_root_authority_binding() -> None:
+    original_path = floating.SOLVER_ROOT_ENVELOPES
+    original = json.loads(original_path.read_text())
+    implementation_sha = hashlib.sha256(
+        floating.IMPLEMENTATION.read_bytes()
+    ).hexdigest()
+    mutations = (
+        (
+            {
+                **original,
+                "status": "SOURCE_GRAPH_SOLVER_MATHEMATICAL_ROOT_ENVELOPES_OPEN",
+            },
+            "identity drifted",
+        ),
+        (
+            {
+                **original,
+                "authority": {
+                    **original["authority"],
+                    "oracle_sha256": "0" * 64,
+                },
+            },
+            "oracle hash drifted",
+        ),
+        (
+            {
+                **original,
+                "envelopes": {
+                    **original["envelopes"],
+                    "f64": {
+                        **original["envelopes"]["f64"],
+                        "root_ulp_error_upper": 21202,
+                    },
+                },
+            },
+            "f64 solver-root envelope drifted",
+        ),
+        (
+            {
+                **original,
+                "release_implications": {
+                    **original["release_implications"],
+                    "backend_lowering_equivalence": "PROVED",
+                },
+            },
+            "release boundary drifted",
+        ),
+    )
+    for document, fragment in mutations:
+        with patched_json(original_path, document) as mutated:
+            floating.SOLVER_ROOT_ENVELOPES = mutated
+            expect_blocked(
+                lambda: floating.load_solver_root_envelopes(implementation_sha),
+                fragment,
+            )
+    floating.SOLVER_ROOT_ENVELOPES = original_path
+
+
 def test_transition_band_integrity() -> None:
     original = json.loads(adjacent.BANDS.read_text())
     original_case = original["cases"][0]
@@ -290,6 +348,7 @@ def main() -> None:
     test_envelope_limits()
     test_exact_real_binding()
     test_adjacent_authority_binding()
+    test_solver_root_authority_binding()
     test_transition_band_integrity()
     test_adjacent_certificate_integrity()
     test_parity_shape()

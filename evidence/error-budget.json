@@ -45,7 +45,7 @@
       "complete_floating_transition_band_census": "PROVED_EXACT_RATIONAL",
       "adjacent_reduction_composition": "PROVED_WITH_FLINT_ARB_AND_INDEPENDENT_MPMATH_VERIFICATION",
       "composition_with_mathematical_bound": "PROVED_VIA_SHADOW_INDEX_QUADRANT_THEOREM",
-      "solver_mathematical_root_ulp_and_true_residual": "OPEN"
+      "solver_mathematical_root_ulp_and_true_residual": "CERTIFIED_SOURCE_GRAPH"
     },
     "backend_lowering_equivalence": {
       "c": "OPEN",
@@ -92,7 +92,7 @@
       "quantity": "independent mathematical |J1(r_hat)| at the cached binary32 root",
       "evidence": "evidence/f32-root-envelope.json",
       "status": "CERTIFIED_SOURCE_CACHE_ARTIFACT",
-      "excluded": "positive_j1_root_solved mathematical-root/true-residual envelope, implementation-reported residual backend conformance, and backend lowering"
+      "excluded": "positive_j1_root_solved mathematical-root/true-residual envelope is certified by separate evidence/solver-root-envelopes.json; implementation-reported residual backend conformance and backend lowering remain open"
     },
     "f64_release_ulp_envelope": {
       "maximum_ulp_error": 0,
@@ -106,18 +106,33 @@
       "quantity": "independent mathematical |J1(r_hat)| at the cached binary64 root",
       "evidence": "evidence/f64-root-envelope.json",
       "status": "CERTIFIED_SOURCE_CACHE_ARTIFACT",
-      "excluded": "positive_j1_root_solved mathematical-root/true-residual envelope, implementation-reported residual backend conformance, and backend lowering"
+      "excluded": "positive_j1_root_solved mathematical-root/true-residual envelope is certified by separate evidence/solver-root-envelopes.json; implementation-reported residual backend conformance and backend lowering remain open"
     },
     "root_solver_source_graph": {
       "evidence": "evidence/root-solver-arithmetic.json",
       "scope": "all valid indices 1..256 separately in f32/f64; source arithmetic, sign-bracket invariant, stopping, result record, and reported-residual construction",
       "status": "SOURCE_GRAPH_ARITHMETIC_PROVED",
-      "excluded": "solver-root mathematical ULP/true-residual envelopes and C/WASM/WebGPU lowering or runtime conformance"
+      "excluded": "solver-root mathematical ULP/true-residual envelopes are separate evidence; C/WASM/WebGPU lowering and runtime conformance remain open"
+    },
+    "root_solver_mathematical_envelopes": {
+      "evidence": "evidence/solver-root-envelopes.json",
+      "scope": "all source-interpreted positive_j1_root_solved outputs for indices 1..256 separately in f32/f64; mathematical-root ULP distance and independent true |J1(root)| residual",
+      "status": "CERTIFIED_SOURCE_GRAPH",
+      "excluded": "solver bracket containment, implementation-reported approximate residual values, backend lowering/runtime behavior, and release conformance",
+      "f32": {
+        "maximum_ulp_error": 3,
+        "maximum_true_residual_abs_hex": "0x1.2c3683a1de614p-18"
+      },
+      "f64": {
+        "maximum_ulp_error": 21203,
+        "maximum_true_residual_abs_hex": "0x1.215d7b11c58aap-37",
+        "fixed_maximum_ulp_witness_index": 4
+      }
     },
     "f32_observed_regression_envelope": {
       "evidence": "evidence/observed-regression-envelopes.json",
       "status": "OBSERVATION_ONLY_NOT_RELEASE_CONFORMANCE"
     },
-    "status": "SOURCE_CACHE_AND_SOLVER_GRAPH_CERTIFIED_MATHEMATICAL_SOLVER_ENVELOPES_AND_BACKENDS_OPEN"
+    "status": "SOURCE_CACHE_AND_SOLVER_MATHEMATICAL_ENVELOPES_CERTIFIED_BACKENDS_OPEN"
   }
 }

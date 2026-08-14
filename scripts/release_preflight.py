@@ -33,6 +33,9 @@ root_correction = json.loads(
 root_solver = json.loads(
     Path("evidence/root-solver-arithmetic.json").read_text()
 )
+solver_root_envelopes = json.loads(
+    Path("evidence/solver-root-envelopes.json").read_text()
+)
 
 if observations.get("status") != "OBSERVED_BASELINE_NOT_RELEASE_CONFORMANCE":
     raise SystemExit("BLOCKED: backend evidence must remain explicitly non-ratifying")
@@ -65,13 +68,23 @@ if floating_point.get("status") != "SOURCE_EVALUATION_PROVED_BACKEND_LOWERING_OP
     raise SystemExit("BLOCKED: source proof/backend-lowering boundary drifted")
 if floating_point.get("release_conformance") is not False:
     raise SystemExit("BLOCKED: source analysis cannot confer backend conformance")
+floating_authority = floating_point.get("authority", {})
+if (
+    floating_authority.get("solver_root_envelopes")
+    != "evidence/solver-root-envelopes.json"
+    or floating_authority.get("solver_root_envelopes_sha256")
+    != hashlib.sha256(
+        Path("evidence/solver-root-envelopes.json").read_bytes()
+    ).hexdigest()
+):
+    raise SystemExit("BLOCKED: floating-point solver-root authority drifted")
 if adjacent.get("status") != "ADJACENT_REDUCTION_COMPOSITION_PROVED":
     raise SystemExit("BLOCKED: adjacent reduction composition proof is missing")
 if adjacent.get("release_implications") != {
     "adjacent_source_reduction_composition": "PROVED",
     "backend_lowering_equivalence": "OPEN",
     "overall_release_status": "INCOMPLETE",
-    "solver_mathematical_root_ulp_and_true_residual": "OPEN",
+    "solver_mathematical_root_ulp_and_true_residual": "CERTIFIED_SEPARATE_EVIDENCE",
 }:
     raise SystemExit("BLOCKED: adjacent proof release boundary drifted")
 if floating_point.get("closed_obligations") != [
@@ -83,17 +96,25 @@ if floating_point.get("closed_obligations") != [
             "composition are certified."
         ),
         "status": "PROVED",
-    }
+    },
+    {
+        "id": "FP-ROOT-SOLVER-MATHEMATICAL-ROOT-ENVELOPES",
+        "statement": (
+            "Every bit-exact source-graph solver output is joined to the "
+            "certified mathematical-root reference bits and an independent "
+            "Arb/mpmath true-residual enclosure."
+        ),
+        "status": "PROVED",
+    },
 ]:
-    raise SystemExit("BLOCKED: adjacent composition obligation closure drifted")
+    raise SystemExit("BLOCKED: floating-point obligation closure drifted")
 if {item.get("status") for item in floating_point.get("open_obligations", [])} != {
     "OPEN"
 }:
     raise SystemExit("BLOCKED: floating-point obligations were not fail-closed")
-if len(floating_point.get("open_obligations", [])) != 4:
-    raise SystemExit("BLOCKED: expected four explicit floating-point obligations")
+if len(floating_point.get("open_obligations", [])) != 3:
+    raise SystemExit("BLOCKED: expected three explicit floating-point obligations")
 expected_obligations = {
-    "FP-ROOT-SOLVER-MATHEMATICAL-ROOT-ENVELOPES",
     "FP-BACKEND-LOWERING-C",
     "FP-BACKEND-LOWERING-WASM",
     "FP-BACKEND-LOWERING-WEBGPU",
@@ -102,6 +123,12 @@ if {
     item.get("id") for item in floating_point.get("open_obligations", [])
 } != expected_obligations:
     raise SystemExit("BLOCKED: floating-point obligation set drifted")
+if floating_point.get("release_implication") != (
+    "BLOCKED; source-graph evaluation proofs are not backend-lowering proofs "
+    "or release envelopes; C/WASM/WebGPU lowering and runtime conformance "
+    "remain open"
+):
+    raise SystemExit("BLOCKED: floating-point release boundary drifted")
 for precision in ("f32", "f64"):
     for function in ("j0", "j1"):
         reduction = floating_point.get("range_reduction_index_analysis", {}).get(
@@ -150,7 +177,7 @@ expected_root_implications = {
     "f64_cached_root_ulp_and_mathematical_residual": "CERTIFIED",
     "f64_reported_residual": "BACKEND_CONFORMANCE_OPEN",
     "overall_release_status": "INCOMPLETE",
-    "solver_mathematical_root_ulp_and_true_residual": "OPEN",
+    "solver_mathematical_root_ulp_and_true_residual": "CERTIFIED_SEPARATE_EVIDENCE",
 }
 expected_root_residuals = {
     "f32": "0x1.0000000000000p-19",
@@ -193,7 +220,7 @@ expected_solver_implications = {
     "implementation_reported_residual_source_semantics": "PROVED",
     "overall_release_status": "INCOMPLETE",
     "root_solver_source_graph_arithmetic": "PROVED",
-    "solver_mathematical_root_ulp_and_true_residual": "OPEN",
+    "solver_mathematical_root_ulp_and_true_residual": "CERTIFIED_SEPARATE_EVIDENCE",
 }
 if root_solver.get("release_implications") != expected_solver_implications:
     raise SystemExit("BLOCKED: root-solver release boundary drifted")
@@ -249,6 +276,116 @@ for precision, cap in (("f32", 48), ("f64", 96)):
         or any(character not in "0123456789abcdef" for character in digest)
     ):
         raise SystemExit(f"BLOCKED: {precision} root-solver transcript drifted")
+if solver_root_envelopes.get("schema_version") != (
+    "futhark-bessel.solver-root-envelopes.v1"
+):
+    raise SystemExit("BLOCKED: solver-root envelope schema drifted")
+if solver_root_envelopes.get("status") != (
+    "SOURCE_GRAPH_SOLVER_MATHEMATICAL_ROOT_ENVELOPES_CERTIFIED"
+):
+    raise SystemExit("BLOCKED: solver-root mathematical envelope is missing")
+if solver_root_envelopes.get("release_conformance") is not False:
+    raise SystemExit("BLOCKED: solver-root source envelope cannot confer conformance")
+if solver_root_envelopes.get("scope", {}).get("excluded") != [
+    "containment of a solver output in an Arb mathematical-root isolating bracket",
+    "the implementation-reported approximate residual value",
+    "C/WASM/WebGPU lowering, contraction, reassociation, and runtime behavior",
+    "release conformance and behavior outside root indices 1..256",
+]:
+    raise SystemExit("BLOCKED: solver-root envelope exclusion boundary drifted")
+if solver_root_envelopes.get("proof_obligation") != {
+    "id": "FP-ROOT-SOLVER-MATHEMATICAL-ROOT-ENVELOPES",
+    "statement": (
+        "The bit-exact source-graph solver outputs have all-index mathematical-"
+        "root ULP and independent true-residual envelopes."
+    ),
+    "status": "PROVED",
+}:
+    raise SystemExit("BLOCKED: solver-root mathematical obligation drifted")
+if solver_root_envelopes.get("release_implications") != {
+    "backend_lowering_equivalence": "OPEN",
+    "backend_runtime_conformance": "OPEN",
+    "overall_release_status": "INCOMPLETE",
+    "solver_bracket_containment": "NOT_CLAIMED",
+    "solver_mathematical_root_ulp_and_true_residual": "CERTIFIED_SOURCE_GRAPH",
+}:
+    raise SystemExit("BLOCKED: solver-root mathematical release boundary drifted")
+solver_envelope_authority = solver_root_envelopes.get("authority", {})
+solver_authority_files = {
+    "implementation": Path(
+        "lib/github.com/Jesssullivan/futhark-bessel/bessel_internal.fut"
+    ),
+    "root_solver_source_evidence": Path("evidence/root-solver-arithmetic.json"),
+    "solver_output_manifest": Path("evidence/solver-root-outputs.jsonl"),
+    "solver_output_manifest_generator": Path("scripts/solver_root_manifest.py"),
+    "oracle": Path("oracle/solver_root_envelopes.c"),
+    "certificate_ledger": Path(
+        "evidence/solver-root-envelope-certificates.jsonl"
+    ),
+    "reference_oracle": Path("oracle/arb_oracle.c"),
+    "reference_certificates": Path("evidence/arb-certificates.jsonl"),
+    "independent_verifier": Path("scripts/solver_root_envelope_proof.py"),
+}
+for field, path in solver_authority_files.items():
+    if solver_envelope_authority.get(field) != str(path):
+        raise SystemExit(f"BLOCKED: solver-root envelope {field} path drifted")
+    if solver_envelope_authority.get(f"{field}_sha256") != hashlib.sha256(
+        path.read_bytes()
+    ).hexdigest():
+        raise SystemExit(f"BLOCKED: solver-root envelope {field} SHA drifted")
+if (
+    solver_envelope_authority.get("solver_output_manifest_rows") != 512
+    or solver_envelope_authority.get("certificate_rows") != 512
+    or solver_envelope_authority.get("source_transcript_sha256")
+    != {
+        precision: root_solver["results"][precision]["transcript"]["sha256"]
+        for precision in ("f32", "f64")
+    }
+):
+    raise SystemExit("BLOCKED: solver-root envelope all-index authority drifted")
+solver_envelopes = solver_root_envelopes.get("envelopes", {})
+for precision, maximum_ulp in (("f32", 3), ("f64", 21203)):
+    envelope = solver_envelopes.get(precision, {})
+    residual_upper = envelope.get("true_residual_abs_upper_hex")
+    if (
+        envelope.get("index_domain") != {"minimum": 1, "maximum": 256}
+        or envelope.get("root_count") != 256
+        or envelope.get("root_ulp_error_upper") != maximum_ulp
+        or not isinstance(residual_upper, str)
+        or not residual_upper.startswith("0x1.")
+        or "p-" not in residual_upper
+    ):
+        raise SystemExit(f"BLOCKED: {precision} solver-root envelope drifted")
+    maximum_witness = envelope.get("maximum_ulp_witness", {})
+    if (
+        maximum_witness.get("ulp_error") != maximum_ulp
+        or not isinstance(maximum_witness.get("solver_root_bits"), str)
+        or not isinstance(maximum_witness.get("reference_root_bits"), str)
+        or not isinstance(maximum_witness.get("true_residual_ball"), str)
+        or not isinstance(maximum_witness.get("true_residual_upper_hex"), str)
+    ):
+        raise SystemExit(f"BLOCKED: {precision} solver-root ULP witness drifted")
+fixed_f64_witness = solver_root_envelopes.get("join", {}).get(
+    "fixed_f64_index4_witness", {}
+)
+if {
+    field: fixed_f64_witness.get(field)
+    for field in ("index", "solver_root_bits", "reference_root_bits", "ulp_error")
+} != {
+    "index": 4,
+    "solver_root_bits": "0x402aa5baf3113875",
+    "reference_root_bits": "0x402aa5baf310e5a2",
+    "ulp_error": 21203,
+}:
+    raise SystemExit("BLOCKED: fixed f64 solver-root index-4 witness drifted")
+if (
+    solver_root_envelopes.get("join", {}).get("joined_rows") != 512
+    or solver_root_envelopes.get("join", {}).get(
+        "all_source_outputs_joined_to_reference_bits_and_residual_balls"
+    )
+    is not True
+):
+    raise SystemExit("BLOCKED: solver-root all-row join drifted")
 if root_correction.get("pre_fix", {}).get("first_witness") != {
     "cached_bits": "0x400ea75575af6f08",
     "certified_bits": "0x400ea75575af6f09",
@@ -317,7 +454,7 @@ if root_correction.get("correction", {}).get(
     raise SystemExit("BLOCKED: corrected cache still has root ULP mismatches")
 root_budget = error_budget.get("root_evidence", {})
 if error_budget.get("root_evidence", {}).get("status") != (
-    "SOURCE_CACHE_AND_SOLVER_GRAPH_CERTIFIED_MATHEMATICAL_SOLVER_ENVELOPES_AND_BACKENDS_OPEN"
+    "SOURCE_CACHE_AND_SOLVER_MATHEMATICAL_ENVELOPES_CERTIFIED_BACKENDS_OPEN"
 ):
     raise SystemExit("BLOCKED: root error-budget boundary drifted")
 if root_budget.get("root_solver_source_graph") != {
@@ -329,11 +466,40 @@ if root_budget.get("root_solver_source_graph") != {
     ),
     "status": "SOURCE_GRAPH_ARITHMETIC_PROVED",
     "excluded": (
-        "solver-root mathematical ULP/true-residual envelopes and C/WASM/WebGPU "
-        "lowering or runtime conformance"
+        "solver-root mathematical ULP/true-residual envelopes are separate "
+        "evidence; C/WASM/WebGPU lowering and runtime conformance remain open"
     ),
 }:
     raise SystemExit("BLOCKED: root-solver error-budget entry drifted")
+expected_solver_budget = {
+    "evidence": "evidence/solver-root-envelopes.json",
+    "scope": (
+        "all source-interpreted positive_j1_root_solved outputs for indices "
+        "1..256 separately in f32/f64; mathematical-root ULP distance and "
+        "independent true |J1(root)| residual"
+    ),
+    "status": "CERTIFIED_SOURCE_GRAPH",
+    "excluded": (
+        "solver bracket containment, implementation-reported approximate "
+        "residual values, backend lowering/runtime behavior, and release "
+        "conformance"
+    ),
+    "f32": {
+        "maximum_ulp_error": 3,
+        "maximum_true_residual_abs_hex": solver_envelopes["f32"][
+            "true_residual_abs_upper_hex"
+        ],
+    },
+    "f64": {
+        "maximum_ulp_error": 21203,
+        "maximum_true_residual_abs_hex": solver_envelopes["f64"][
+            "true_residual_abs_upper_hex"
+        ],
+        "fixed_maximum_ulp_witness_index": 4,
+    },
+}
+if root_budget.get("root_solver_mathematical_envelopes") != expected_solver_budget:
+    raise SystemExit("BLOCKED: solver-root mathematical error-budget entry drifted")
 for precision in ("f32", "f64"):
     if root_budget.get(f"{precision}_release_ulp_envelope", {}).get(
         "maximum_ulp_error"

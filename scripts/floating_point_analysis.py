@@ -5,8 +5,8 @@
 This is deliberately not a backend proof.  It analyzes the written Futhark
 operation order under the primitive semantics declared in the emitted record.
 The adjacent reduction-cell theorem is independently certified and composed
-here.  Backend lowering equivalence and root arithmetic remain separate,
-fail-closed obligations.
+here.  The separate source-solver mathematical-root theorem is bound here as a
+closed obligation.  Backend lowering equivalence remains fail-closed.
 """
 
 from __future__ import annotations
@@ -28,6 +28,7 @@ ANALYZER = Path("scripts/floating_point_analysis.py")
 EXACT_REAL = Path("evidence/real-approximation-bounds.json")
 ADJACENT_PROOF = Path("evidence/adjacent-composition-proof.json")
 TRANSITION_BANDS = Path("evidence/adjacent-reduction-bands.json")
+SOLVER_ROOT_ENVELOPES = Path("evidence/solver-root-envelopes.json")
 OUTPUT = Path("evidence/floating-point-analysis.json")
 EXPECTED_IMPLEMENTATION_SHA256 = (
     "2b459fb3e24e82a825db5f44cc8b3ebe9c8387d598235f84c4e80996b4e7d9d1"
@@ -414,7 +415,7 @@ def load_adjacent_proof(implementation_sha: str) -> dict[str, Any]:
         "adjacent_source_reduction_composition": "PROVED",
         "backend_lowering_equivalence": "OPEN",
         "overall_release_status": "INCOMPLETE",
-        "solver_mathematical_root_ulp_and_true_residual": "OPEN",
+        "solver_mathematical_root_ulp_and_true_residual": "CERTIFIED_SEPARATE_EVIDENCE",
     }:
         raise SystemExit("adjacent proof release implications drifted")
     authority = proof.get("authority", {})
@@ -453,6 +454,91 @@ def load_adjacent_proof(implementation_sha: str) -> dict[str, Any]:
         for order in (0, 1)
     ) != 2584:
         raise SystemExit("adjacent proof floating transition-band census drifted")
+    return proof
+
+
+def load_solver_root_envelopes(implementation_sha: str) -> dict[str, Any]:
+    raw = SOLVER_ROOT_ENVELOPES.read_bytes()
+    proof = json.loads(raw)
+    if proof.get("schema_version") != (
+        "futhark-bessel.solver-root-envelopes.v1"
+    ) or proof.get("status") != (
+        "SOURCE_GRAPH_SOLVER_MATHEMATICAL_ROOT_ENVELOPES_CERTIFIED"
+    ):
+        raise SystemExit("solver-root mathematical envelope identity drifted")
+    if proof.get("release_conformance") is not False:
+        raise SystemExit("solver-root source envelope cannot confer conformance")
+    if proof.get("proof_obligation") != {
+        "id": "FP-ROOT-SOLVER-MATHEMATICAL-ROOT-ENVELOPES",
+        "status": "PROVED",
+        "statement": (
+            "The bit-exact source-graph solver outputs have all-index "
+            "mathematical-root ULP and independent true-residual envelopes."
+        ),
+    }:
+        raise SystemExit("solver-root mathematical obligation drifted")
+    if proof.get("release_implications") != {
+        "backend_lowering_equivalence": "OPEN",
+        "backend_runtime_conformance": "OPEN",
+        "overall_release_status": "INCOMPLETE",
+        "solver_bracket_containment": "NOT_CLAIMED",
+        "solver_mathematical_root_ulp_and_true_residual": "CERTIFIED_SOURCE_GRAPH",
+    }:
+        raise SystemExit("solver-root release boundary drifted")
+    envelopes = proof.get("envelopes", {})
+    for precision, maximum_ulp in (("f32", 3), ("f64", 21203)):
+        envelope = envelopes.get(precision, {})
+        if (
+            envelope.get("index_domain") != {"minimum": 1, "maximum": 256}
+            or envelope.get("root_count") != 256
+            or envelope.get("root_ulp_error_upper") != maximum_ulp
+            or not isinstance(envelope.get("true_residual_abs_upper_hex"), str)
+        ):
+            raise SystemExit(f"{precision} solver-root envelope drifted")
+    f64_envelope = envelopes.get("f64", {})
+    f64_maximum_witness = f64_envelope.get("maximum_ulp_witness", {})
+    if proof.get("join", {}).get("fixed_f64_index4_witness", {}) != {
+        "index": 4,
+        "solver_root_bits": "0x402aa5baf3113875",
+        "reference_root_bits": "0x402aa5baf310e5a2",
+        "ulp_error": 21203,
+        "true_residual_ball": f64_maximum_witness.get("true_residual_ball"),
+        "true_residual_upper_hex": f64_maximum_witness.get(
+            "true_residual_upper_hex"
+        ),
+    }:
+        raise SystemExit("fixed f64 solver-root index-4 witness drifted")
+
+    authority = proof.get("authority", {})
+    if (
+        authority.get("implementation") != str(IMPLEMENTATION)
+        or authority.get("implementation_sha256") != implementation_sha
+    ):
+        raise SystemExit("solver-root implementation authority drifted")
+    expected_files = {
+        "root_solver_source_evidence": Path("evidence/root-solver-arithmetic.json"),
+        "solver_output_manifest": Path("evidence/solver-root-outputs.jsonl"),
+        "solver_output_manifest_generator": Path("scripts/solver_root_manifest.py"),
+        "oracle": Path("oracle/solver_root_envelopes.c"),
+        "certificate_ledger": Path(
+            "evidence/solver-root-envelope-certificates.jsonl"
+        ),
+        "reference_oracle": Path("oracle/arb_oracle.c"),
+        "reference_certificates": Path("evidence/arb-certificates.jsonl"),
+        "independent_verifier": Path("scripts/solver_root_envelope_proof.py"),
+    }
+    for field, path in expected_files.items():
+        if authority.get(field) != str(path):
+            raise SystemExit(f"solver-root {field} path drifted")
+        if authority.get(f"{field}_sha256") != hashlib.sha256(
+            path.read_bytes()
+        ).hexdigest():
+            raise SystemExit(f"solver-root {field} hash drifted")
+    if (
+        authority.get("solver_output_manifest_rows") != 512
+        or authority.get("certificate_rows") != 512
+    ):
+        raise SystemExit("solver-root all-index authority row count drifted")
     return proof
 
 
@@ -508,6 +594,7 @@ def generate() -> dict[str, Any]:
     exact_real = json.loads(EXACT_REAL.read_text())
     validate_exact_real(exact_real, implementation_sha)
     adjacent_proof = load_adjacent_proof(implementation_sha)
+    solver_root_envelopes = load_solver_root_envelopes(implementation_sha)
     results: dict[str, Any] = {}
     reduction_evidence: dict[str, Any] = {}
     transition_document = json.loads(TRANSITION_BANDS.read_text())
@@ -663,12 +750,13 @@ def generate() -> dict[str, Any]:
                 "written Futhark J0/J1 source-operation order, including "
                 "gradual-underflow absolute error terms, finite intermediates, "
                 "the complete adjacent reduction partition, all quadrant maps, "
-                "and composition with mathematical approximation bounds"
+                "composition with mathematical approximation bounds, and the "
+                "separately certified all-index source-solver mathematical-root "
+                "ULP/true-residual envelopes"
             ),
             "excluded": (
-                "backend lowering equivalence, contraction/reassociation, root "
-                "solver mathematical-root ULP/true-residual envelopes, and "
-                "runtime conformance"
+                "backend lowering equivalence, contraction/reassociation, "
+                "solver bracket containment, and runtime conformance"
             ),
             "composition_with_exact_real_bound": (
                 "PROVED_VIA_SHADOW_INDEX_ADJACENT_QUADRANT_COMPOSITION"
@@ -689,6 +777,10 @@ def generate() -> dict[str, Any]:
             "transition_band_authority": str(TRANSITION_BANDS),
             "transition_band_authority_sha256": hashlib.sha256(
                 TRANSITION_BANDS.read_bytes()
+            ).hexdigest(),
+            "solver_root_envelopes": str(SOLVER_ROOT_ENVELOPES),
+            "solver_root_envelopes_sha256": hashlib.sha256(
+                SOLVER_ROOT_ENVELOPES.read_bytes()
             ).hexdigest(),
             "arithmetic": (
                 "exact Python fractions; binary64 is used only to encode outward "
@@ -718,6 +810,21 @@ def generate() -> dict[str, Any]:
             "range_reduction_index_abs_upper": 653,
             "finite_intermediates": True,
         },
+        "solver_root_envelopes": {
+            precision: {
+                "root_count": solver_root_envelopes["envelopes"][precision][
+                    "root_count"
+                ],
+                "root_ulp_error_upper": solver_root_envelopes["envelopes"][
+                    precision
+                ]["root_ulp_error_upper"],
+                "true_residual_abs_upper_hex": solver_root_envelopes[
+                    "envelopes"
+                ][precision]["true_residual_abs_upper_hex"],
+                "status": "CERTIFIED_SOURCE_GRAPH",
+            }
+            for precision in ("f32", "f64")
+        },
         "maximum_intermediate_magnitude_upper_hex": upward_float_hex(maximum_intermediate),
         "closed_obligations": [
             {
@@ -728,18 +835,18 @@ def generate() -> dict[str, Any]:
                     "adjacent selected quadrants, the shadow radius, and the "
                     "Taylor/phase/Hankel composition are certified."
                 ),
-            }
-        ],
-        "open_obligations": [
+            },
             {
                 "id": "FP-ROOT-SOLVER-MATHEMATICAL-ROOT-ENVELOPES",
-                "status": "OPEN",
+                "status": "PROVED",
                 "statement": (
-                    "Bind the separately proved bracketed root-solver source "
-                    "graph to solver-output mathematical-root ULP and true-"
-                    "residual envelopes."
+                    "Every bit-exact source-graph solver output is joined to "
+                    "the certified mathematical-root reference bits and an "
+                    "independent Arb/mpmath true-residual enclosure."
                 ),
             },
+        ],
+        "open_obligations": [
             {
                 "id": "FP-BACKEND-LOWERING-C",
                 "status": "OPEN",
@@ -767,8 +874,8 @@ def generate() -> dict[str, Any]:
         ],
         "release_implication": (
             "BLOCKED; source-graph evaluation proofs are not backend-lowering "
-            "proofs or release envelopes, and solver mathematical-root "
-            "envelopes remain open"
+            "proofs or release envelopes; C/WASM/WebGPU lowering and runtime "
+            "conformance remain open"
         ),
     }
 
@@ -790,8 +897,8 @@ def main() -> None:
             "scripts/floating_point_analysis.py --write"
         )
     print(
-        "OK source evaluation and adjacent composition bounds; release remains "
-        "BLOCKED on backend lowering and solver mathematical-root envelopes"
+        "OK source evaluation, adjacent composition, and solver mathematical-root "
+        "envelopes; release remains BLOCKED on backend lowering/conformance"
     )
 
 

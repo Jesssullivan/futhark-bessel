@@ -7,7 +7,7 @@
     "implementation_sha256": "2b459fb3e24e82a825db5f44cc8b3ebe9c8387d598235f84c4e80996b4e7d9d1",
     "independent_library": "mpmath 1.4.1 besselj/besseljzero",
     "independent_verifier": "scripts/root_envelope_proof.py",
-    "independent_verifier_sha256": "42a748c82c6774834345d6a62d006005ec7bd3c3f874a07ed896c7f06696ac74",
+    "independent_verifier_sha256": "e3a1985c3c92e0892fabf1a211f3851faeb8d0b2019d3c71e0f42aec2147d12a",
     "oracle": "oracle/root_envelopes.c",
     "oracle_sha256": "4404158ed8bbd96c024de45da8dc04ddf5d7171d3383d2159fb4b6f5f6fe9df4",
     "root_cache": "lib/github.com/Jesssullivan/futhark-bessel/root_cache.fut",
@@ -47,12 +47,12 @@
     "f64_cached_root_ulp_and_mathematical_residual": "CERTIFIED",
     "f64_reported_residual": "BACKEND_CONFORMANCE_OPEN",
     "overall_release_status": "INCOMPLETE",
-    "solver_mathematical_root_ulp_and_true_residual": "OPEN"
+    "solver_mathematical_root_ulp_and_true_residual": "CERTIFIED_SEPARATE_EVIDENCE"
   },
   "schema_version": "futhark-bessel.f32-root-envelope.v1",
   "scope": {
     "covered": "all 256 binary32 root literals returned by the public cached positive_j1_root path; ULP distance is measured against the correctly rounded mathematical J1 root and residual means the independent mathematical value |J1(r_hat)|; Arb-certified reference bits generate the disposable, non-authoritative cache, while a separate Arb computation and mpmath replay verify it",
-    "excluded": "positive_j1_root_solved mathematical-root ULP/true-residual envelopes, implementation-reported residual backend conformance, and C/WASM/WebGPU lowering or runtime conformance"
+    "excluded": "positive_j1_root_solved mathematical-root ULP/true-residual envelopes (certified by separate evidence/solver-root-envelopes.json), implementation-reported residual backend conformance, and C/WASM/WebGPU lowering or runtime conformance"
   },
   "status": "SOURCE_CACHE_ROOT_ENVELOPE_CERTIFIED"
 }
