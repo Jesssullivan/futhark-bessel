@@ -29,10 +29,13 @@ graph LR
     M --> A["FLINT/Arb certificates"]
     A --> P["Independent mpmath replay"]
     A --> C["Generated root cache"]
+    A --> S["Source graph + adjacent composition"]
     A --> B["C and WASM observations"]
     C --> F
+    F --> S
     F --> B
     P --> G["Release gates"]
+    S --> G
     B --> G
 ```
 
@@ -40,8 +43,8 @@ The proof and test layers deliberately make different claims:
 
 | Layer | Main recipe | Scope |
 | --- | --- | --- |
-| Exact-real approximation | `just approximation-proof` | Series, Hankel, range reduction, and transitions |
-| Written floating-point graph | `just floating-point-analysis` | Explicit source-operation rounding model |
+| Exact-real approximation | `just approximation-proof` | Series, Hankel, switches, and reduction cells/ties |
+| Written floating-point graph | `just floating-point-analysis` | Source-operation rounding model and adjacent transition-band composition |
 | Recomputing root solver | `just root-solver-proof` and `just solver-root-envelope-proof` | Source arithmetic plus mathematical root error and residual |
 | Cached roots | `just root-envelope-proof` | Correct rounding and mathematical residuals for indices 1–256 |
 | Runtime observations | `just backend-conformance` and `just observed-envelopes` | Finite-sample C/WASM regression evidence |
@@ -54,15 +57,15 @@ These boundaries are intentional:
   envelopes.
 - WebGPU is compile-checked only; runtime conformance remains open.
 - The checked-in root table is a reproducible cache, not numerical authority.
-- `positive_j1_root_solved` is a recomputation path, not the certified cache;
-  current source-graph bounds are 3 ULP for f32 and 21,203 ULP for f64, while
-  containment in an Arb mathematical-root-isolating bracket and
-  reported-residual accuracy remain uncertified.
+- `positive_j1_root_solved` is a recomputation path, not the certified cache.
+  Its current source-graph and mathematical-root bounds live in
+  [`solver-root-envelopes.json`](evidence/solver-root-envelopes.json); backend
+  containment and reported-residual accuracy remain uncertified.
 
 Machine-readable evidence lives in [`evidence/`](evidence/). Method provenance
-is summarized in [`evidence/provenance.json`](evidence/provenance.json), while
-each evidence record carries its own authority bindings. Release gates and
-remaining blockers live in [RELEASE.md](RELEASE.md).
+is summarized in [`evidence/provenance.json`](evidence/provenance.json).
+Selected proof summaries bind their certificate ledgers, implementation, and
+verifiers. Release gates and remaining blockers live in [RELEASE.md](RELEASE.md).
 
 ## Reproduce
 
