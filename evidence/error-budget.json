@@ -1,0 +1,138 @@
+{
+  "schema_version": "futhark-bessel.error-budget.v1",
+  "release_status": "INCOMPLETE",
+  "mathematical_approximation": {
+    "small_argument": {
+      "method": "Defining alternating power series evaluated through fixed terms",
+      "f64_terms": 97,
+      "f64_switch_abs_x": 12.0,
+      "f32_terms": 49,
+      "f32_switch_abs_x": 6.0,
+      "certification_status": "CERTIFIED_EXACT_REAL",
+      "certificate": "evidence/real-approximation-bounds.json"
+    },
+    "large_argument": {
+      "method": "Hankel expansion with DLMF 10.17(iii) first-neglected-term remainder theorem",
+      "f64_generated_terms": 12,
+      "f64_switch_abs_x": 12.0,
+      "f32_generated_terms": 7,
+      "f32_switch_abs_x": 6.0,
+      "certification_status": "CERTIFIED_EXACT_REAL",
+      "certificate": "evidence/real-approximation-bounds.json"
+    },
+    "range_reduction_and_elementary_functions": {
+      "method": "Exhaustive round-to-quadrant cell partition plus compositional interval bounds for split phase constants, sine/cosine Taylor tails, and the prefactor constant",
+      "boundary_certificates": 2584,
+      "switch_certificates": 4,
+      "certification_status": "CERTIFIED_EXACT_REAL",
+      "certificate": "evidence/real-approximation-bounds.json"
+    },
+    "whole_domain": {
+      "domain": "real x with |x| <= 1024",
+      "status": "CERTIFIED_EXACT_REAL_WHOLE_DOMAIN",
+      "excluded": "backend floating-point rounding, contraction, and reassociation"
+    }
+  },
+  "floating_point_rounding_reassociation": {
+    "status": "SOURCE_EVALUATION_PROVED_BACKEND_LOWERING_OPEN",
+    "evidence": "evidence/floating-point-analysis.json",
+    "adjacent_composition_evidence": "evidence/adjacent-composition-proof.json",
+    "transition_band_authority": "evidence/adjacent-reduction-bands.json",
+    "source_graph": {
+      "series_branches": "PROVED_AND_COMPOSED_UNDER_DECLARED_PRIMITIVE_SEMANTICS",
+      "asymptotic_branches": "PROVED_AND_COMPOSED_UNDER_DECLARED_PRIMITIVE_SEMANTICS",
+      "exact_range_reduction_index_equality": "FALSIFIED_WITH_MACHINE_CHECKED_WITNESSES",
+      "complete_floating_transition_band_census": "PROVED_EXACT_RATIONAL",
+      "adjacent_reduction_composition": "PROVED_WITH_FLINT_ARB_AND_INDEPENDENT_MPMATH_VERIFICATION",
+      "composition_with_mathematical_bound": "PROVED_VIA_SHADOW_INDEX_QUADRANT_THEOREM",
+      "solver_mathematical_root_ulp_and_true_residual": "CERTIFIED_SOURCE_GRAPH"
+    },
+    "backend_lowering_equivalence": {
+      "c": "OPEN",
+      "wasm": "OPEN",
+      "webgpu": "OPEN"
+    },
+    "note": "The source proof is conditional only on its explicitly declared IEEE round-to-nearest-even primitives and strict operation tree. It does not infer C, WASM, or WebGPU lowering semantics from oracle agreement."
+  },
+  "pinned_compiler_smoke": {
+    "compiler_version": "Futhark 0.27.0 prerelease",
+    "compiler_git_commit": "8d6d12f0c31e133d7b5bd39c1254c541aa6ef70a",
+    "c_f64": "RUNTIME_OBSERVATIONS_RECORDED",
+    "c_f32": "RUNTIME_OBSERVATIONS_RECORDED",
+    "wasm_f64": "RUNTIME_OBSERVATIONS_RECORDED",
+    "wasm_f32": "RUNTIME_OBSERVATIONS_RECORDED",
+    "webgpu_f32": "LIBRARY_COMPILED_NOT_EXECUTED",
+    "scope": "C/WASM execute certified finite samples and roots. WebGPU is compilation-only. None is a declared release envelope or whole-domain proof."
+  },
+  "observed_backend_maxima": {
+    "evidence_file": "evidence/backend-observations.json",
+    "declared_regression_envelopes": "evidence/observed-regression-envelopes.json",
+    "c_f64": "RECORDED_FINITE_SAMPLE_BASELINE",
+    "c_f32": "RECORDED_FINITE_SAMPLE_BASELINE",
+    "wasm_f64": "RECORDED_FINITE_SAMPLE_BASELINE",
+    "wasm_f32": "RECORDED_FINITE_SAMPLE_BASELINE",
+    "webgpu_f32": null,
+    "status": "OBSERVED_BASELINE_AND_SAMPLE_ONLY_ENVELOPES_NOT_RELEASE_CONFORMANCE"
+  },
+  "root_evidence": {
+    "f64_brackets": {
+      "count": 256,
+      "format": "outward-rounded adjacent binary64 endpoints",
+      "certifier": "FLINT/Arb 3.6.0",
+      "status": "CERTIFIED"
+    },
+    "f32_release_ulp_envelope": {
+      "maximum_ulp_error": 0,
+      "scope": "all 256 public cached binary32 roots against the correctly rounded mathematical J1 roots",
+      "evidence": "evidence/f32-root-envelope.json",
+      "status": "CERTIFIED_SOURCE_CACHE_ARTIFACT"
+    },
+    "f32_release_residual_envelope": {
+      "maximum_true_residual_abs_hex": "0x1.0000000000000p-19",
+      "quantity": "independent mathematical |J1(r_hat)| at the cached binary32 root",
+      "evidence": "evidence/f32-root-envelope.json",
+      "status": "CERTIFIED_SOURCE_CACHE_ARTIFACT",
+      "excluded": "positive_j1_root_solved mathematical-root/true-residual envelope is certified by separate evidence/solver-root-envelopes.json; implementation-reported residual backend conformance and backend lowering remain open"
+    },
+    "f64_release_ulp_envelope": {
+      "maximum_ulp_error": 0,
+      "scope": "all 256 public cached binary64 roots against the correctly rounded mathematical J1 roots",
+      "evidence": "evidence/f64-root-envelope.json",
+      "status": "CERTIFIED_SOURCE_CACHE_ARTIFACT",
+      "correction_witness": "evidence/f64-root-cache-correction.json"
+    },
+    "f64_release_residual_envelope": {
+      "maximum_true_residual_abs_hex": "0x1.0000000000000p-48",
+      "quantity": "independent mathematical |J1(r_hat)| at the cached binary64 root",
+      "evidence": "evidence/f64-root-envelope.json",
+      "status": "CERTIFIED_SOURCE_CACHE_ARTIFACT",
+      "excluded": "positive_j1_root_solved mathematical-root/true-residual envelope is certified by separate evidence/solver-root-envelopes.json; implementation-reported residual backend conformance and backend lowering remain open"
+    },
+    "root_solver_source_graph": {
+      "evidence": "evidence/root-solver-arithmetic.json",
+      "scope": "all valid indices 1..256 separately in f32/f64; source arithmetic, sign-bracket invariant, stopping, result record, and reported-residual construction",
+      "status": "SOURCE_GRAPH_ARITHMETIC_PROVED",
+      "excluded": "solver-root mathematical ULP/true-residual envelopes are separate evidence; C/WASM/WebGPU lowering and runtime conformance remain open"
+    },
+    "root_solver_mathematical_envelopes": {
+      "evidence": "evidence/solver-root-envelopes.json",
+      "scope": "all source-interpreted positive_j1_root_solved outputs for indices 1..256 separately in f32/f64; mathematical-root ULP distance and independent true |J1(root)| residual",
+      "status": "CERTIFIED_SOURCE_GRAPH",
+      "excluded": "solver bracket containment, implementation-reported approximate residual values, backend lowering/runtime behavior, and release conformance",
+      "f32": {
+        "maximum_ulp_error": 3,
+        "maximum_true_residual_abs_hex": "0x1.2c3683a1de614p-18"
+      },
+      "f64": {
+        "maximum_ulp_error": 21203,
+        "maximum_true_residual_abs_hex": "0x1.215d7b11c58aap-37",
+        "fixed_maximum_ulp_witness_index": 4
+      }
+    },
+    "f32_observed_regression_envelope": {
+      "evidence": "evidence/observed-regression-envelopes.json",
+      "status": "OBSERVATION_ONLY_NOT_RELEASE_CONFORMANCE"
+    },
+    "status": "SOURCE_CACHE_AND_SOLVER_MATHEMATICAL_ENVELOPES_CERTIFIED_BACKENDS_OPEN"
+  }
+}

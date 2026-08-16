@@ -1,0 +1,58 @@
+{
+  "authority": {
+    "certificate_library": "FLINT/Arb 3.6.0 arb_hypgeom_bessel_j",
+    "certificates": "evidence/root-envelope-certificates.jsonl",
+    "certificates_sha256": "e4739642e3e88faa6ace72432bfc7c240adfa6974b7766960fd6bc8de4d80edc",
+    "implementation": "lib/github.com/Jesssullivan/futhark-bessel/bessel_internal.fut",
+    "implementation_sha256": "2b459fb3e24e82a825db5f44cc8b3ebe9c8387d598235f84c4e80996b4e7d9d1",
+    "independent_library": "mpmath 1.4.1 besselj/besseljzero",
+    "independent_verifier": "scripts/root_envelope_proof.py",
+    "independent_verifier_sha256": "e3a1985c3c92e0892fabf1a211f3851faeb8d0b2019d3c71e0f42aec2147d12a",
+    "oracle": "oracle/root_envelopes.c",
+    "oracle_sha256": "4404158ed8bbd96c024de45da8dc04ddf5d7171d3383d2159fb4b6f5f6fe9df4",
+    "root_cache": "lib/github.com/Jesssullivan/futhark-bessel/root_cache.fut",
+    "root_cache_renderer": "scripts/render_root_cache.py",
+    "root_cache_renderer_mutation_checks": "scripts/test_render_root_cache_fail_closed.py",
+    "root_cache_renderer_mutation_checks_sha256": "70a645551ed28e119f27374f356ad6aeafe0281cf4ea148bd5463e3118a733df",
+    "root_cache_renderer_sha256": "f0163fb9d39025d53fec60ae98b2f52d7e7cc70190ca2a8f310f72a10dd16e17",
+    "root_cache_role": "NON_AUTHORITATIVE_DERIVED_ARTIFACT",
+    "root_cache_sha256": "a9c4aa56f0e757a4df8cff4d4a4f7290a7a481c81c14e0f3cc464dfb24bab086",
+    "root_reference_certificates": "evidence/arb-certificates.jsonl",
+    "root_reference_certificates_sha256": "392d10fa295a3ab03c2a0bd4a52c426593a6705d2e843177215064601f62ea0a",
+    "root_reference_oracle": "oracle/arb_oracle.c",
+    "root_reference_oracle_sha256": "09dac50267e13497eb14391db3f9581f7d856b1237073a2a631756c2289dff97"
+  },
+  "envelopes": {
+    "certified_maximum_true_residual_upper_hex": "0x1.16c24b25ef3f5p-20",
+    "certified_maximum_true_residual_upper_index": 172,
+    "index_domain": {
+      "maximum": 256,
+      "minimum": 1
+    },
+    "precision": "f32",
+    "root_ulp_error_upper": 0,
+    "true_residual_abs_upper_hex": "0x1.0000000000000p-19"
+  },
+  "independent_replay": {
+    "all_correctly_rounded": true,
+    "maximum_true_residual_decimal": "1.038458046206294024639857595898372199805e-6",
+    "maximum_true_residual_index": 172,
+    "root_count": 256
+  },
+  "release_conformance": false,
+  "release_implications": {
+    "backend_lowering_equivalence": "OPEN",
+    "f32_cached_root_ulp_and_mathematical_residual": "CERTIFIED",
+    "f32_reported_residual": "BACKEND_CONFORMANCE_OPEN",
+    "f64_cached_root_ulp_and_mathematical_residual": "CERTIFIED",
+    "f64_reported_residual": "BACKEND_CONFORMANCE_OPEN",
+    "overall_release_status": "INCOMPLETE",
+    "solver_mathematical_root_ulp_and_true_residual": "CERTIFIED_SEPARATE_EVIDENCE"
+  },
+  "schema_version": "futhark-bessel.f32-root-envelope.v1",
+  "scope": {
+    "covered": "all 256 binary32 root literals returned by the public cached positive_j1_root path; ULP distance is measured against the correctly rounded mathematical J1 root and residual means the independent mathematical value |J1(r_hat)|; Arb-certified reference bits generate the disposable, non-authoritative cache, while a separate Arb computation and mpmath replay verify it",
+    "excluded": "positive_j1_root_solved mathematical-root ULP/true-residual envelopes (certified by separate evidence/solver-root-envelopes.json), implementation-reported residual backend conformance, and C/WASM/WebGPU lowering or runtime conformance"
+  },
+  "status": "SOURCE_CACHE_ROOT_ENVELOPE_CERTIFIED"
+}

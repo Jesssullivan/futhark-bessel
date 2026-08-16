@@ -3,9 +3,14 @@
 .gitleaks.toml.local
 .nix-*
 build/
+evidence/*.jsonl
+/tests/backend_conformance
+/tests/f32_tests
+/tests/f64_tests
 result
 result-*
 *.c
+!oracle/*.c
 *.h
 *.js
 *.wasm

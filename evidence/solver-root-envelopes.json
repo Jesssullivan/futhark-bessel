@@ -1,0 +1,142 @@
+{
+  "authority": {
+    "certificate_ledger": "evidence/solver-root-envelope-certificates.jsonl",
+    "certificate_ledger_sha256": "c5132a20adc2f93a2dcb794730b526795c8eb537a48388526fb67c4921d36190",
+    "certificate_library": "FLINT/Arb 3.6.0 arb_hypgeom_bessel_j at 512-bit precision",
+    "certificate_rows": 512,
+    "implementation": "lib/github.com/Jesssullivan/futhark-bessel/bessel_internal.fut",
+    "implementation_sha256": "2b459fb3e24e82a825db5f44cc8b3ebe9c8387d598235f84c4e80996b4e7d9d1",
+    "independent_library": "mpmath 1.4.1 besselj/besseljzero at 160 decimal digits",
+    "independent_verifier": "scripts/solver_root_envelope_proof.py",
+    "independent_verifier_sha256": "4f5591b7d78fd7c0f6b0ce8c50ef8b932c9629aebd8d44199c3a4129cf07f8bc",
+    "oracle": "oracle/solver_root_envelopes.c",
+    "oracle_sha256": "de67978d041305aa5508879785bbeb17078c087b7347cd0c3c107bd672c345a3",
+    "reference_certificates": "evidence/arb-certificates.jsonl",
+    "reference_certificates_sha256": "392d10fa295a3ab03c2a0bd4a52c426593a6705d2e843177215064601f62ea0a",
+    "reference_oracle": "oracle/arb_oracle.c",
+    "reference_oracle_sha256": "09dac50267e13497eb14391db3f9581f7d856b1237073a2a631756c2289dff97",
+    "root_solver_source_evidence": "evidence/root-solver-arithmetic.json",
+    "root_solver_source_evidence_sha256": "63e36c656959b28708bf9c9424d323459d43c0a597889526c76ce257655f548b",
+    "solver_output_manifest": "evidence/solver-root-outputs.jsonl",
+    "solver_output_manifest_generator": "scripts/solver_root_manifest.py",
+    "solver_output_manifest_generator_sha256": "b6b4b8c74d39cb2ea7747b6955b8d165649e813f9cb32cc2abdf2552a8da06b7",
+    "solver_output_manifest_rows": 512,
+    "solver_output_manifest_sha256": "c48b3691150f861a4bbc5db677da407c571906570ec0547535908715010b5f10",
+    "source_transcript_sha256": {
+      "f32": "08cf214b172106eac8e0e9b56ed92005aea28dc920fed2988f54cbc9ad5ed16e",
+      "f64": "14956fd6936dfe4a2904d3b52d65115795456d22dba0c0fa86b22ffddf4d5fbb"
+    }
+  },
+  "envelopes": {
+    "f32": {
+      "independent_maximum_true_residual_decimal": "4.4735215015633674009708523167268327805380099382327e-6",
+      "independent_maximum_true_residual_index": 167,
+      "index_domain": {
+        "maximum": 256,
+        "minimum": 1
+      },
+      "maximum_true_residual_witness": {
+        "index": 167,
+        "reference_root_bits": "0x44035b90",
+        "solver_root_bits": "0x44035b92",
+        "true_residual_ball": "[4.4735215015633674009708523167268327805380099382326642064221916099426871655824618e-6 +/- 4.89e-86]",
+        "true_residual_upper_hex": "0x1.2c3683a1de614p-18",
+        "ulp_error": 2
+      },
+      "maximum_ulp_witness": {
+        "index": 2,
+        "reference_root_bits": "0x40e07fb0",
+        "solver_root_bits": "0x40e07fb3",
+        "true_residual_ball": "[4.8430369671868316023366644227615740202695358699009369719560932261764985917202389e-7 +/- 2.57e-87]",
+        "true_residual_upper_hex": "0x1.04023178271ffp-21",
+        "ulp_error": 3
+      },
+      "precision": "f32",
+      "root_count": 256,
+      "root_ulp_error_upper": 3,
+      "solver_outputs_differing_from_correctly_rounded_root_count": 178,
+      "true_residual_abs_upper_hex": "0x1.2c3683a1de614p-18"
+    },
+    "f64": {
+      "independent_maximum_true_residual_decimal": "8.2242524723689983684479495413814715266090363577482e-12",
+      "independent_maximum_true_residual_index": 4,
+      "index_domain": {
+        "maximum": 256,
+        "minimum": 1
+      },
+      "maximum_true_residual_witness": {
+        "index": 4,
+        "reference_root_bits": "0x402aa5baf310e5a2",
+        "solver_root_bits": "0x402aa5baf3113875",
+        "true_residual_ball": "[8.2242524723689983684479495413814715266090363577481649202383573093390893733749105e-12 +/- 1.75e-92]",
+        "true_residual_upper_hex": "0x1.215d7b11c58aap-37",
+        "ulp_error": 21203
+      },
+      "maximum_ulp_witness": {
+        "index": 4,
+        "reference_root_bits": "0x402aa5baf310e5a2",
+        "solver_root_bits": "0x402aa5baf3113875",
+        "true_residual_ball": "[8.2242524723689983684479495413814715266090363577481649202383573093390893733749105e-12 +/- 1.75e-92]",
+        "true_residual_upper_hex": "0x1.215d7b11c58aap-37",
+        "ulp_error": 21203
+      },
+      "precision": "f64",
+      "root_count": 256,
+      "root_ulp_error_upper": 21203,
+      "solver_outputs_differing_from_correctly_rounded_root_count": 179,
+      "true_residual_abs_upper_hex": "0x1.215d7b11c58aap-37"
+    }
+  },
+  "independent_replay": {
+    "precision_results": {
+      "f32": {
+        "maximum_true_residual_decimal": "4.4735215015633674009708523167268327805380099382327e-6",
+        "maximum_true_residual_index": 167,
+        "root_count": 256
+      },
+      "f64": {
+        "maximum_true_residual_decimal": "8.2242524723689983684479495413814715266090363577482e-12",
+        "maximum_true_residual_index": 4,
+        "root_count": 256
+      }
+    },
+    "reference_root_rounding_validated_for_all_rows": true,
+    "solver_true_residual_enclosed_for_all_rows": true
+  },
+  "join": {
+    "all_source_outputs_joined_to_reference_bits_and_residual_balls": true,
+    "fixed_f64_index4_witness": {
+      "index": 4,
+      "reference_root_bits": "0x402aa5baf310e5a2",
+      "solver_root_bits": "0x402aa5baf3113875",
+      "true_residual_ball": "[8.2242524723689983684479495413814715266090363577481649202383573093390893733749105e-12 +/- 1.75e-92]",
+      "true_residual_upper_hex": "0x1.215d7b11c58aap-37",
+      "ulp_error": 21203
+    },
+    "joined_rows": 512
+  },
+  "proof_obligation": {
+    "id": "FP-ROOT-SOLVER-MATHEMATICAL-ROOT-ENVELOPES",
+    "statement": "The bit-exact source-graph solver outputs have all-index mathematical-root ULP and independent true-residual envelopes.",
+    "status": "PROVED"
+  },
+  "release_conformance": false,
+  "release_implications": {
+    "backend_lowering_equivalence": "OPEN",
+    "backend_runtime_conformance": "OPEN",
+    "overall_release_status": "INCOMPLETE",
+    "solver_bracket_containment": "NOT_CLAIMED",
+    "solver_mathematical_root_ulp_and_true_residual": "CERTIFIED_SOURCE_GRAPH"
+  },
+  "schema_version": "futhark-bessel.solver-root-envelopes.v1",
+  "scope": {
+    "covered": "positive_j1_root_solved returned-root bit patterns for every index 1..256, separately in f32 and f64; ULP distance against the existing Arb-certified correctly rounded mathematical J1 root and independent Arb/mpmath bounds on |J1(root)|",
+    "excluded": [
+      "containment of a solver output in an Arb mathematical-root isolating bracket",
+      "the implementation-reported approximate residual value",
+      "C/WASM/WebGPU lowering, contraction, reassociation, and runtime behavior",
+      "release conformance and behavior outside root indices 1..256"
+    ]
+  },
+  "status": "SOURCE_GRAPH_SOLVER_MATHEMATICAL_ROOT_ENVELOPES_CERTIFIED"
+}

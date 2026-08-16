@@ -1,0 +1,82 @@
+{
+  "declared_envelopes": {
+    "f32": {
+      "roots": {
+        "max_absolute_error_hex": "0x0p+0",
+        "max_independent_residual_hex": "0x1p-19",
+        "max_reported_residual_hex": "0x1p-18",
+        "max_ulp_error": 0
+      },
+      "values": {
+        "asymptotic": {
+          "j0": {
+            "max_absolute_error_hex": "0x1p-22",
+            "max_ulp_error": 2048
+          },
+          "j1": {
+            "max_absolute_error_hex": "0x1p-19",
+            "max_ulp_error": 128
+          }
+        },
+        "series": {
+          "j0": {
+            "max_absolute_error_hex": "0x1p-19",
+            "max_ulp_error": 128
+          },
+          "j1": {
+            "max_absolute_error_hex": "0x1p-19",
+            "max_ulp_error": 64
+          }
+        }
+      }
+    },
+    "f64": {
+      "roots": {
+        "max_absolute_error_hex": "0x0p+0",
+        "max_independent_residual_hex": "0x1p-48",
+        "max_reported_residual_hex": "0x1p-36",
+        "max_ulp_error": 0
+      },
+      "values": {
+        "asymptotic": {
+          "j0": {
+            "max_absolute_error_hex": "0x1p-34",
+            "max_ulp_error": 8388608
+          },
+          "j1": {
+            "max_absolute_error_hex": "0x1p-36",
+            "max_ulp_error": 524288
+          }
+        },
+        "series": {
+          "j0": {
+            "max_absolute_error_hex": "0x1p-42",
+            "max_ulp_error": 32768
+          },
+          "j1": {
+            "max_absolute_error_hex": "0x1p-41",
+            "max_ulp_error": 16384
+          }
+        }
+      }
+    }
+  },
+  "observation_authority": {
+    "sha256": "d92bd7f2205c3276b86a250152d683585e813bb7d5a7aa8925a3b5f5e8551655",
+    "source": "evidence/backend-observations.json"
+  },
+  "policy": {
+    "backends": [
+      "c",
+      "wasm"
+    ],
+    "derivation": "Manually declared dyadic regression ceilings; the checker never derives or changes a ceiling from a sampled maximum.",
+    "failure_meaning": "A regression or evidence drift requiring review; it does not prove that a passing backend satisfies a whole-domain bound.",
+    "sample_scope": "The exact Arb-certified sample and root ledger executed by evidence/backend-observations.json.",
+    "webgpu": "NOT_EXECUTED_NO_ENVELOPE",
+    "whole_domain_claim": false
+  },
+  "release_conformance": false,
+  "schema_version": "futhark-bessel.observed-regression-envelopes.v1",
+  "status": "OBSERVATION_ONLY_NOT_RELEASE_CONFORMANCE"
+}
