@@ -59,7 +59,7 @@ These boundaries are intentional:
 - The checked-in root table is a reproducible cache, not numerical authority.
 - `positive_j1_root_solved` is a recomputation path, not the certified cache.
   Its current source-graph and mathematical-root bounds live in
-  [`solver-root-envelopes.json`](evidence/solver-root-envelopes.json); backend
+  [`solver-root-envelopes.json`](evidence/solver-root-envelopes.json); bracket
   containment and reported-residual accuracy remain uncertified.
 
 Machine-readable evidence lives in [`evidence/`](evidence/). Method provenance
