@@ -24,7 +24,7 @@ distinguishes finite results, out-of-domain inputs, and nonfinite inputs on
 ## Evidence
 
 ```mermaid
-flowchart LR
+graph LR
     D["Definitions"] --> A["Arb certificates"]
     A --> P["Independent mpmath replay"]
     A --> C["Root cache"]
