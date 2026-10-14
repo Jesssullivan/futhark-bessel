@@ -26,25 +26,30 @@ distinguishes finite results, out-of-domain inputs, and nonfinite inputs on
 ```mermaid
 flowchart LR
     D["Definitions"] --> A["Arb certificates"]
-    A --> P["mpmath replay"]
+    A --> P["Independent mpmath replay"]
     A --> C["Root cache"]
     D --> F["Futhark source"]
     C --> F
+    A --> S
     F --> S["Source-graph proofs"]
+    A --> O
     F --> O["C/WASM samples"]
     P --> G["Release gates"]
     S --> G
     O --> G
 ```
 
-Exact-real and source-graph proofs do not certify backend lowering, contraction,
-or reassociation. C/WASM samples are regression tripwires, not whole-domain
-release envelopes; WebGPU is compile-checked only.
+Exact-real certificates cover switches and reduction cells/ties; source-graph
+proofs cover floating-point operations and adjacent transition-band
+composition. Neither certifies backend lowering, contraction, or reassociation.
+C/WASM samples are regression tripwires, not whole-domain release envelopes;
+WebGPU is compile-checked only.
 
 The root table is a reproducible cache, not numerical authority.
-`positive_j1_root_solved` is a separate recomputation path; its bounds are in
-[`solver-root-envelopes.json`](evidence/solver-root-envelopes.json), while
-bracket containment and reported-residual accuracy remain uncertified.
+`positive_j1_root_solved` is a separate recomputation path; its source-graph and
+mathematical-root bounds are in
+[`solver-root-envelopes.json`](evidence/solver-root-envelopes.json), while bracket
+containment and reported-residual accuracy remain uncertified.
 
 Machine-readable evidence lives in [`evidence/`](evidence/). Method provenance
 is in [`provenance.json`](evidence/provenance.json); focused recipes are listed by
